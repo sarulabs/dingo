@@ -1,0 +1,12 @@
+language: go
+
+go:
+  - tip
+
+install:
+  - go get github.com/fatih/color
+  - go get github.com/gobuffalo/packr
+  - go get github.com/pkg/errors
+  - go get github.com/stretchr/testify
+
+script: ./dingo/run_tests.sh
