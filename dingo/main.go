@@ -15,7 +15,7 @@ import (
 	"github.com/sarulabs/dingo/generation/tools"
 )
 
-const version = "1.0.0"
+const version = "1.0.1"
 
 func main() {
 	src, dest := parseFlags()

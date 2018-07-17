@@ -88,7 +88,7 @@ var digits = []byte("0123456789")
 // into something that can be used as a method name
 // for the generated container.
 func FormatDefName(name string) string {
-	formatted := strings.Builder{}
+	formatted := bytes.NewBuffer(nil)
 	start := true
 
 	for _, c := range name {
@@ -130,7 +130,7 @@ func DefNameIsAllowed(name string) error {
 
 // FormatPkgName formats a package name by keeping only the letters.
 func FormatPkgName(name string) string {
-	formatted := strings.Builder{}
+	formatted := bytes.NewBuffer(nil)
 
 	for _, c := range []byte(name) {
 		if bytes.Contains(letters, []byte{c}) {
