@@ -8,7 +8,6 @@ package dic
 
 import (
 	dingoerrors "errors"
-	dingolog "log"
 	dingohttp "net/http"
 
 	dingo "github.com/sarulabs/dingo"
@@ -19,10 +18,13 @@ import (
 )
 
 // C retrieves a Container from an interface.
+// The function panics if the Container can not be retrieved.
+//
 // The interface can be :
 // - a *Container
-// - an *http.Request containing a *Container in its Context
+// - an *http.Request containing a *Container in its context.Context
 //   for the dingo.ContainerKey("dingo") key.
+//
 // The function can be changed to match the needs of your application.
 var C = func(i interface{}) *Container {
 	if c, ok := i.(*Container); ok {
@@ -30,32 +32,22 @@ var C = func(i interface{}) *Container {
 	}
 
 	r, ok := i.(*dingohttp.Request)
-	if !ok && ErrorCallback != nil {
-		ErrorCallback(dingoerrors.New("could not get container with C()"))
-		return nil
+	if !ok {
+		panic("could not get the container with C()")
 	}
 	
 	c, ok := r.Context().Value(dingo.ContainerKey("dingo")).(*Container)
-	if !ok && ErrorCallback != nil {
-		ErrorCallback(dingoerrors.New("could not get container from *http.Request"))
-		return nil
+	if !ok {
+		panic("could not get the container from the given *http.Request")
 	}
 
 	return c
 }
 
-// ErrorCallback is a function that is called
-// when there is an error while retrieving an object
-// with the Get method (and its derivatives).
-// The function can be changed to match the needs of your application.
-var ErrorCallback = func(err error) {
-	dingolog.Println(err.Error())
-}
-
 // NewContainer creates a new Container.
 // If no scope is provided, dingo.App, dingo.Request and dingo.SubRequest are used.
-// The returned Container has the wider scope (dingo.App).
-// The SubContainer() method should be called to get a Container in a narrower scope.
+// The returned Container has the most generic scope (dingo.App).
+// The SubContainer() method should be called to get a Container in a more specific scope.
 func NewContainer(scopes ...string) (*Container, error) {
 	if dingo.Version != "1" {
 		return nil, dingoerrors.New("The generated code requires github.com/sarulabs/dingo at version 1, but got version " + dingo.Version)
@@ -76,7 +68,7 @@ func NewContainer(scopes ...string) (*Container, error) {
 	}
 
 	for _, d := range getDefinitions(provider) {
-		if err := b.AddDefinition(d); err != nil {
+		if err := b.Add(d); err != nil {
 			return nil, err
 		}
 	}
@@ -85,11 +77,13 @@ func NewContainer(scopes ...string) (*Container, error) {
 }
 
 // Container represents a dependency injection container.
-// A Container has a scope and may have a parent with a wider scope
-// and children with a narrower scope.
+// To create a Container, you should use a Builder or another Container.
+//
+// A Container has a scope and may have a parent in a more generic scope
+// and children in a more specific scope.
 // Objects can be retrieved from the Container.
-// If the desired object does not already exist in the Container,
-// it is built thanks to the object Definition.
+// If the requested object does not already exist in the Container,
+// it is built thanks to the object definition.
 // The following attempts to get this object will return the same object.
 type Container struct {
 	ctn dingodi.Container
@@ -110,7 +104,7 @@ func (c *Container) ParentScopes() []string {
 	return c.ctn.ParentScopes()
 }
 
-// SubScopes returns the list of scopes narrower than the Container scope.
+// SubScopes returns the list of scopes that are more specific than the Container scope.
 func (c *Container) SubScopes() []string {
 	return c.ctn.SubScopes()
 }
@@ -123,7 +117,7 @@ func (c *Container) Parent() *Container {
 	return nil
 }
 
-// SubContainer creates a new Container in the next subscope
+// SubContainer creates a new Container in the next sub-scope
 // that will have this Container as parent.
 func (c *Container) SubContainer() (*Container, error) {
 	sub, err := c.ctn.SubContainer()
@@ -134,7 +128,7 @@ func (c *Container) SubContainer() (*Container, error) {
 }
 
 // SafeGet retrieves an object from the Container.
-// The object needs to belong to this scope or a wider one.
+// The object has to belong to this scope or a more generic one.
 // If the object does not already exist, it is created and saved in the Container.
 // If the object can not be created, it returns an error.
 func (c *Container) SafeGet(name string) (interface{}, error) {
@@ -142,53 +136,56 @@ func (c *Container) SafeGet(name string) (interface{}, error) {
 }
 
 // Get is similar to SafeGet but it does not return the error.
-// The error is handled by ErrorCallback.
+// Instead it panics.
 func (c *Container) Get(name string) interface{} {
 	o, err := c.ctn.SafeGet(name)
-	if err != nil && ErrorCallback != nil {
-		ErrorCallback(err)
+	if err != nil {
+		panic(err)
 	}
 	return o
 }
 
 // UnscopedSafeGet retrieves an object from the Container, like SafeGet.
 // The difference is that the object can be retrieved
-// even if it belongs to a narrower scope.
-// To do so UnscopedSafeGet creates a sub-container.
+// even if it belongs to a more specific scope.
+// To do so, UnscopedSafeGet creates a sub-container.
 // When the created object is no longer needed,
-// it is important to use the Clean method to Delete this sub-container.
+// it is important to use the Clean method to delete this sub-container.
 func (c *Container) UnscopedSafeGet(name string) (interface{}, error) {
 	return c.ctn.UnscopedSafeGet(name)
 }
 
 // UnscopedGet is similar to UnscopedSafeGet but it does not return the error.
+// Instead it panics.
 func (c *Container) UnscopedGet(name string) interface{} {
 	o, err := c.ctn.UnscopedSafeGet(name)
-	if err != nil && ErrorCallback != nil {
-		ErrorCallback(err)
+	if err != nil {
+		panic(err)
 	}
 	return o
 }
 
-// Clean deletes the sub-container created by UnscopedSafeGet or UnscopedGet.
-func (c *Container) Clean() {
-	c.ctn.Clean()
+// Clean deletes the sub-container created by UnscopedSafeGet, UnscopedGet or UnscopedFill.
+func (c *Container) Clean() error {
+	return c.ctn.Clean()
 }
 
 // DeleteWithSubContainers takes all the objects saved in this Container
-// and calls their Close function if it exists.
-// It will also call DeleteWithSubContainers on each child Container
-// and remove its reference in the parent Container.
+// and calls the Close function of their Definition on them.
+// It will also call DeleteWithSubContainers on each child and remove its reference in the parent Container.
 // After deletion, the Container can no longer be used.
-func (c *Container) DeleteWithSubContainers() {
-	c.ctn.DeleteWithSubContainers()
+// The sub-containers are deleted even if they are still used in other goroutines.
+// It can cause errors. You may want to use the Delete method instead.
+func (c *Container) DeleteWithSubContainers() error {
+	return c.ctn.DeleteWithSubContainers()
 }
 
-// Delete works like DeleteWithSubContainers but do not delete the subcontainers.
-// If the Container has subcontainers, it will not be deleted right away.
-// The deletion only occurs when all the subcontainers have been deleted.
-func (c *Container) Delete() {
-	c.ctn.Delete()
+// Delete works like DeleteWithSubContainers if the Container does not have any child.
+// But if the Container has sub-containers, it will not be deleted right away.
+// The deletion only occurs when all the sub-containers have been deleted manually.
+// So you have to call Delete or DeleteWithSubContainers on all the sub-containers.
+func (c *Container) Delete() error {
+	return c.ctn.Delete()
 }
 
 // IsClosed returns true if the Container has been deleted.
@@ -207,18 +204,18 @@ func (c *Container) SafeGet<<< $def.FormattedName >>>() (<<< $def.ObjectType >>>
 
 	o, ok := i.(<<< $def.ObjectType >>>)
 	if !ok {
-		return <<< $def.EmptyObject >>>, dingoerrors.New("could not cast object to <<< $def.ObjectType >>>")
+		return <<< $def.EmptyObject >>>, dingoerrors.New("could get `<<< $def.Name >>>` because the object could not be cast to <<< $def.ObjectType >>>")
 	}
 
 	return o, nil
 }
 
 // Get<<< $def.FormattedName >>> is similar to SafeGet<<< $def.FormattedName >>> but it does not return the error.
-// The error is handled by ErrorCallback.
+// Instead it panics.
 func (c *Container) Get<<< $def.FormattedName >>>() <<< $def.ObjectType >>> {
 	o, err := c.SafeGet<<< $def.FormattedName >>>()
-	if err != nil && ErrorCallback != nil {
-		ErrorCallback(err)
+	if err != nil {
+		panic(err)
 	}
 	return o
 }
@@ -233,18 +230,18 @@ func (c *Container) UnscopedSafeGet<<< $def.FormattedName >>>() (<<< $def.Object
 
 	o, ok := i.(<<< $def.ObjectType >>>)
 	if !ok {
-		return <<< $def.EmptyObject >>>, dingoerrors.New("could not cast object to <<< $def.ObjectType >>>")
+		return <<< $def.EmptyObject >>>, dingoerrors.New("could get `<<< $def.Name >>>` because the object could not be cast to <<< $def.ObjectType >>>")
 	}
 
 	return o, nil
 }
 
 // UnscopedGet<<< $def.FormattedName >>> is similar to UnscopedSafeGet<<< $def.FormattedName >>> but it does not return the error.
-// The error is handled by ErrorCallback.
+// Instead it panics.
 func (c *Container) UnscopedGet<<< $def.FormattedName >>>() <<< $def.ObjectType >>> {
 	o, err := c.UnscopedSafeGet<<< $def.FormattedName >>>()
-	if err != nil && ErrorCallback != nil {
-		ErrorCallback(err)
+	if err != nil {
+		panic(err)
 	}
 	return o
 }
@@ -252,13 +249,9 @@ func (c *Container) UnscopedGet<<< $def.FormattedName >>>() <<< $def.ObjectType 
 // <<< $def.FormattedName >>> is similar to Get<<< $def.FormattedName >>>.
 // It tries to find the container with the C method and the given interface.
 // If the container can be retrieved, it applies the Get<<< $def.FormattedName >>> method.
-// If the container can not be retrieved, it returns the default value for the returned type.
+// If the container can not be retrieved, it panics.
 func <<< $def.FormattedName >>>(i interface{}) <<< $def.ObjectType >>> {
-	c := C(i)
-	if c == nil {
-		return <<< $def.EmptyObject >>>
-	}
-	return c.Get<<< $def.FormattedName >>>()
+	return C(i).Get<<< $def.FormattedName >>>()
 }
 
 <<< end >>>

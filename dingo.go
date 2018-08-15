@@ -23,7 +23,7 @@ type Def struct {
 	Build interface{}
 	// Params are used to assist the service constructor.
 	Params Params
-	// Close should be a function: func(any).
+	// Close should be a function: func(any) error.
 	// With any being the type of the service.
 	Close interface{}
 }

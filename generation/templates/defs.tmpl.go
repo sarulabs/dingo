@@ -15,8 +15,8 @@ import (
 	<<< $alias >>> "<<< $pkg >>>"<<< end >>>
 )
 
-func getDefinitions(provider *dingodependencies.Provider) []dingodi.Definition {
-	return []dingodi.Definition{
+func getDefinitions(provider *dingodependencies.Provider) []dingodi.Def {
+	return []dingodi.Def{
 		<<<- range $index, $def := .Defs ->>>
 			<<< template "definition" $def >>>
 		<<<- end >>>
@@ -37,7 +37,7 @@ func getDefinitions(provider *dingodependencies.Provider) []dingodi.Definition {
 			Build: func(ctn dingodi.Container) (interface{}, error) {
 <<< template "buildBody" . >>>
 			},
-			Close: func(obj interface{}) <<< template "closeBody" . >>>,
+			Close: func(obj interface{}) error <<< template "closeBody" . >>>,
 		},
 <<<- end >>>
 
@@ -74,12 +74,12 @@ func getDefinitions(provider *dingodependencies.Provider) []dingodi.Definition {
 	<<< else >>>
 				pi<<< .Index >>>, ok := d.Params["<<< .Name >>>"]
 				if !ok {
-					return <<< .Def.EmptyObject >>>, dingoerrors.New("could not find parameter <<< .Name >>> of <<< .Def.Name >>>")
+					return <<< .Def.EmptyObject >>>, dingoerrors.New("could not find parameter <<< .Name >>>")
 				}
 	<<< end >>>
 				p<<< .Index >>>, ok := pi<<< .Index >>>.(<<< .Type >>>)
 				if !ok {
-					return <<< .Def.EmptyObject >>>, dingoerrors.New("could not cast parameter <<< .Name >>> of <<< .Def.Name >>> to <<< .Type >>>")
+					return <<< .Def.EmptyObject >>>, dingoerrors.New("could not cast parameter <<< .Name >>> to <<< .Type >>>")
 				}
 <<< end >>>
 <<< end >>>
@@ -92,7 +92,7 @@ func getDefinitions(provider *dingodependencies.Provider) []dingodi.Definition {
 <<< define "objectFunc" >>>
 				b, ok := d.Build.(<<< .BuildType >>>)
 				if !ok {
-					return <<< .EmptyObject >>>, dingoerrors.New("could not cast build of <<< .Name >>> to <<< .BuildType >>>")
+					return <<< .EmptyObject >>>, dingoerrors.New("could not cast build function to <<< .BuildType >>>")
 				}
 
 				return b(<<< .ParamsString >>>)
@@ -114,25 +114,27 @@ func getDefinitions(provider *dingodependencies.Provider) []dingodi.Definition {
 
 <<< define "closeBody" >>>
 <<<- if eq .CloseType "" ->>>
-{}
+{
+				return nil
+			}
 <<<- else ->>>
 {
 				d, err := provider.Get("<<< .Name >>>")
 				if err != nil {
-					return
+					return err
 				}
 
 				c, ok := d.Close.(<<< .CloseType >>>)
 				if !ok {
-					return
+					return dingoerrors.New("could not cast close function to `<<< .CloseType >>>`")
 				}
 
 				o, ok := obj.(<<< .ObjectType >>>)
 				if !ok {
-					return
+					return dingoerrors.New("could not cast object to `<<< .ObjectType >>>`")
 				}
 
-				c(o)
+				return c(o)
 			}
 <<<- end ->>>
 <<< end >>>

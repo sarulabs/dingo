@@ -149,12 +149,14 @@ func (s *Scanner) scanClose(def *dingo.Def, scannedDef *ScannedDef) error {
 		return errors.New("Close should be a function")
 	}
 
-	if t.NumOut() != 0 {
-		return errors.New("Close should not have any parameter")
+	errorInterface := reflect.TypeOf((*error)(nil)).Elem()
+
+	if t.NumOut() != 1 || !t.Out(0).Implements(errorInterface) {
+		return errors.New("Close should return an error")
 	}
 
 	if t.NumIn() != 1 {
-		return errors.New("Close should have exactly one parameter")
+		return errors.New("Close should have exactly one input parameter")
 	}
 
 	return s.scanCloseParameter(def, scannedDef, t)

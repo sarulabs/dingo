@@ -6,8 +6,7 @@ Generation of dependency injection containers for go programs (golang).
 
 It is better than [sarulabs/di](https://github.com/sarulabs/di) alone because:
 - Generated containers have **typed** methods to retrieve each object. You do not need to cast them before they can be used. That implies less runtime errors.
-- Definitions are easy to write. The generated code is also **safer** compared to what you may write yourself. That also means that the code is **easier to debug**.
-- Some dependencies can be guessed, allowing **shorter definitions**.
+- Definitions are easy to write. Some dependencies can be guessed, allowing **shorter definitions**.
 
 The disadvantage is that the code must be generated. But this can be compensated by the use of a file watcher.
 
@@ -258,8 +257,9 @@ dingo.Def{
     Build: func() (*MyObject, error) {
         return &MyObject{}, nil
     },
-    Close: func(obj *MyObject) {
+    Close: func(obj *MyObject) error {
         // Close object.
+        return nil
     }
 }
 ```
