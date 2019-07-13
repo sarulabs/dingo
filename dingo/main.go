@@ -15,19 +15,25 @@ import (
 	"github.com/sarulabs/dingo/generation/tools"
 )
 
-const version = "2.0.0"
+const version = "2.1.0"
+
+type cmdFlags struct {
+	src     *string
+	dest    *string
+	destPkg *string
+}
 
 func main() {
-	src, dest := parseFlags()
-
-	if src == "" || dest == "" {
+	flags, err := parseFlags()
+	if err != nil {
+		printError(err.Error())
 		printTitle()
 		printUsage()
 		return
 	}
 
 	// Create Locator.
-	loc, err := generation.NewLocator(src, dest)
+	loc, err := generation.NewLocator(*flags.src, *flags.dest, *flags.destPkg)
 	handleError(err)
 
 	// generate container
@@ -75,25 +81,27 @@ func generateContainer(loc *generation.Locator, box packr.Box) {
 	handleError(errors.Wrap(err, "could not move files to destination directory"))
 }
 
-func parseFlags() (string, string) {
+func parseFlags() (cmdFlags, error) {
 	fs := flag.NewFlagSet("dingo", flag.ContinueOnError)
 	fs.Usage = func() {}
 	fs.SetOutput(ioutil.Discard)
 
-	src := fs.String("src", "", "")
-	dest := fs.String("dest", "", "")
+	flags := cmdFlags{
+		src:     fs.String("src", "", ""),
+		dest:    fs.String("dest", "", ""),
+		destPkg: fs.String("destPkg", "", ""),
+	}
 
 	err := fs.Parse(os.Args[1:])
 	if err != nil {
-		printError(err.Error())
-		return "", ""
+		return flags, err
 	}
 
-	if *src == "" || *dest == "" {
-		printError("-src and -dest flags can not be empty")
+	if *flags.src == "" || *flags.dest == "" {
+		return flags, errors.New("-src and -dest flags can not be empty")
 	}
 
-	return *src, *dest
+	return flags, nil
 }
 
 func printTitle() {
@@ -120,7 +128,6 @@ dingo -src=path/to/definition/directory -dest=path/to/generated/code
 
 • The generated code will be in the path/to/generated/code directory.
 • If the destination directory previously existed, it will be deleted and replaced by a new one.
-• The source and destination directories need to be in your $GOPATH.
 `)
 }
 

@@ -2,7 +2,8 @@
 
 set -e
 
-testsDir="$(dirname $0)/../dingo/tests/"
+baseDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+testsDir="$baseDir/tests/"
 
 # app tests
 cd $testsDir/app

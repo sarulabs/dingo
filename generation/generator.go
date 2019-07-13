@@ -58,8 +58,9 @@ func (gen *Generator) Run() error {
 		return errors.New("could not write Compiler template: " + err.Error())
 	}
 
-	out, _ := exec.Command("go", "run", tmpDir+"/main.go").CombinedOutput()
-
+	cmd := exec.Command("go", "run", tmpDir+"/main.go")
+	cmd.Dir = gen.Locator.SourceDir()
+	out, _ := cmd.CombinedOutput()
 	if !strings.HasPrefix(string(out), "dingoCompilerSuccess") {
 		return errors.New("an error occurred while running the generated compiler:\n" + string(out))
 	}

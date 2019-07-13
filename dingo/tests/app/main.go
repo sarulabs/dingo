@@ -7,11 +7,18 @@ import (
 )
 
 func main() {
-	mainFile := os.Getenv("GOPATH") + "/src/github.com/sarulabs/dingo/dingo/main.go"
-	inputDir := os.Getenv("GOPATH") + "/src/github.com/sarulabs/dingo/dingo/tests/app/services"
-	outputDir := os.Getenv("GOPATH") + "/src/github.com/sarulabs/dingo/dingo/tests/app/generated_services"
+	dir, err := os.Getwd()
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
 
-	out, err := exec.Command("go", "run", mainFile, "-src="+inputDir, "-dest="+outputDir).CombinedOutput()
+	mainFile := dir + "/../../main.go"
+	inputDir := dir + "/services"
+	outputDir := dir + "/generated_services"
+	destPkg := "github.com/sarulabs/dingo/dingo/tests/app/generated_services"
+
+	out, err := exec.Command("go", "run", mainFile, "-src="+inputDir, "-dest="+outputDir, "-destPkg="+destPkg).CombinedOutput()
 
 	fmt.Println(string(out))
 
