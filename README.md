@@ -47,7 +47,7 @@ You can use `go get` to install the latest dingo binary:
 go get -u github.com/sarulabs/dingo/dingo
 ```
 
-In your project, you need to import `github.com/sarulabs/dingo` to write your objects definitions. You can use `go get` or a dependency manager like `vgo`:
+In your project, you need to import `github.com/sarulabs/dingo` to write your objects definitions:
 
 ```sh
 go get github.com/sarulabs/dingo
@@ -65,8 +65,6 @@ dingo -src="$projectDir/services" -dest="$projectDir/generatedServices"
 
 - **src**: the directory containing your definitions
 - **dest**: the directory where the code will be generated
-
-The only requirement is that these two directories must be in your `$GOPATH`.
 
 There is no watch mode included in dingo. You need to bring your own file watcher.
 
@@ -303,9 +301,9 @@ interface {
     func Get(name string) interface{} {
     func UnscopedSafeGet(name string) (interface{}, error) {
     func UnscopedGet(name string) interface{} {
-    func Clean() {
-    func DeleteWithSubContainers() {
-    func Delete() {
+    func Clean() error {
+    func DeleteWithSubContainers() error {
+    func Delete() error {
     func IsClosed() bool {
 }
 ````
@@ -347,25 +345,6 @@ The name conversion follow these rules:
 For example `--apple--orange--2--PERRY--` would become `AppleOrange2PERRY`.
 
 Note that you can not have a name beginning by a digit.
-
-
-## Logging errors
-
-In the generated `dic` package, there is a function used to log the container errors.
-
-```go
-var ErrorCallback = func(err error) {
-	log.Println(err.Error())
-}
-````
-
-You can change its behavior and use your own logger:
-
-```go
-dic.ErrorCallback = func(err error) {
-	// Use your own logger.
-}
-````
 
 
 ## C function
