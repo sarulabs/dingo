@@ -1,8 +1,8 @@
 package services
 
 import (
-	"github.com/sarulabs/dingo/v2"
-	"github.com/sarulabs/dingo/v2/tests/app/pkg"
+	"github.com/sarulabs/dingo/v3"
+	"github.com/sarulabs/dingo/v3/tests/app/pkg"
 )
 
 // AutofillDecls is used in the tests.

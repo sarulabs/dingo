@@ -18,7 +18,7 @@ func NewDICopier(loc *Locator, subdir string, box packr.Box) *DICopier {
 }
 
 // DICopier is able to copy the github.com/sarulabs/di repository.
-// The files are in github.com/sarulabs/dingo/v2/generation/di.
+// The files are in github.com/sarulabs/dingo/v3/generation/di.
 type DICopier struct {
 	// Output is where the repository should be copied.
 	Output string

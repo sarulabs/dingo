@@ -1,6 +1,6 @@
 package tools
 
-import "github.com/sarulabs/dingo/v2"
+import "github.com/sarulabs/dingo/v3"
 
 // Provider is an interface that contains the public methods
 // of the generated Provider. It is used in the Scanner

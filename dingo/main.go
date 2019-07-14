@@ -11,11 +11,11 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/fatih/color"
-	"github.com/sarulabs/dingo/v2/generation"
-	"github.com/sarulabs/dingo/v2/generation/tools"
+	"github.com/sarulabs/dingo/v3/generation"
+	"github.com/sarulabs/dingo/v3/generation/tools"
 )
 
-const version = "2.2.0"
+const version = "3.0.0"
 
 type cmdFlags struct {
 	src     *string
