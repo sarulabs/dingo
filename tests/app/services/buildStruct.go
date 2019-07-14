@@ -1,8 +1,8 @@
 package services
 
 import (
-	"github.com/sarulabs/dingo"
-	"github.com/sarulabs/dingo/dingo/tests/app/pkg"
+	"github.com/sarulabs/dingo/v2"
+	"github.com/sarulabs/dingo/v2/tests/app/pkg"
 )
 
 // BuildStructDecls is used in the tests.

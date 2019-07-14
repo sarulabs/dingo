@@ -4,7 +4,7 @@ import (
 	"errors"
 	"reflect"
 
-	"github.com/sarulabs/dingo"
+	"github.com/sarulabs/dingo/v2"
 )
 
 // Scanner analyzes the definitions provided by a Provider.
