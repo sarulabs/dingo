@@ -9,7 +9,7 @@ package main
 import (
    	"fmt"
 
-	"github.com/sarulabs/dingo"
+	"github.com/sarulabs/dingo/v2"
 	"<<< .TemplatesPkg >>>"
 	"<<< .ToolsPkg >>>"
 	"<<< .TmpDependenciesPkg >>>"
@@ -17,7 +17,7 @@ import (
 
 func main() {
 	if dingo.Version != "1" {
-		fmt.Println("This command requires having github.com/sarulabs/dingo at version 1, but got version " + dingo.Version)
+		fmt.Println("This command requires having github.com/sarulabs/dingo/v2 at version 1, but got version " + dingo.Version)
 		return
 	}
 

@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/sarulabs/dingo"
+	"github.com/sarulabs/dingo/v2"
 )
 
 // ParamScanner helps the Scanner.

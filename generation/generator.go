@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/gobuffalo/packr"
-	"github.com/sarulabs/dingo/generation/tools"
+	"github.com/sarulabs/dingo/v2/generation/tools"
 )
 
 // NewGenerator is the Generator constructor.
@@ -58,10 +58,11 @@ func (gen *Generator) Run() error {
 		return errors.New("could not write Compiler template: " + err.Error())
 	}
 
-	cmd := exec.Command("go", "run", tmpDir+"/main.go")
-	cmd.Dir = gen.Locator.SourceDir()
+
+	cmd := exec.Command("go", "run", "main.go")
+	cmd.Dir = tmpDir
 	out, _ := cmd.CombinedOutput()
-	if !strings.HasPrefix(string(out), "dingoCompilerSuccess") {
+	if !strings.Contains(string(out), "dingoCompilerSuccess") {
 		return errors.New("an error occurred while running the generated compiler:\n" + string(out))
 	}
 

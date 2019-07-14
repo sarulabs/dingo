@@ -3,8 +3,8 @@ package services
 import (
 	"strconv"
 
-	"github.com/sarulabs/dingo"
-	"github.com/sarulabs/dingo/dingo/tests/app/pkg"
+	"github.com/sarulabs/dingo/v2"
+	"github.com/sarulabs/dingo/v2/tests/app/pkg"
 )
 
 // BuildFuncDecls is used in the tests.

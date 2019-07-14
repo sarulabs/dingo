@@ -7,7 +7,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/sarulabs/dingo"
+	"github.com/sarulabs/dingo/v2"
 )
 
 // Scan contains the parsed information about the service definitions.

@@ -9,4 +9,4 @@ install:
   - go get github.com/pkg/errors
   - go get github.com/stretchr/testify
 
-script: ./dingo/run_tests.sh
+script: ./tests/run_tests.sh
