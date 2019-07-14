@@ -16,7 +16,7 @@ func main() {
 	mainFile := dir + "/../../dingo/main.go"
 	inputDir := dir + "/services"
 	outputDir := dir + "/generated_services"
-	destPkg := "github.com/sarulabs/dingo/v2/tests/app/generated_services"
+	destPkg := "github.com/sarulabs/dingo/v3/tests/app/generated_services"
 
 	out, err := exec.Command("go", "run", mainFile, "-src="+inputDir, "-dest="+outputDir, "-destPkg="+destPkg).CombinedOutput()
 

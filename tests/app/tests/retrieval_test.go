@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"github.com/sarulabs/dingo/v2/tests/app/generated_services/dic"
+	"github.com/sarulabs/dingo/v3/tests/app/generated_services/dic"
 	"github.com/stretchr/testify/require"
 )
 

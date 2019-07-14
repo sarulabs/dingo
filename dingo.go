@@ -51,7 +51,7 @@ type Service string
 type AutoFill bool
 
 // Version is used by the dingo command to ensure that
-// the github.com/sarulabs/dingo/v2/dingo package
+// the github.com/sarulabs/dingo/v3/dingo package
 // is in the right version inside your project.
 const Version = "1"
 

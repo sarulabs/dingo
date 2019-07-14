@@ -10,7 +10,7 @@ import (
 	dingoerrors "errors"
 	dingohttp "net/http"
 
-	dingo "github.com/sarulabs/dingo/v2"
+	dingo "github.com/sarulabs/dingo/v3"
 	dingodi "<<< .DiPkg >>>"
 	dingodependencies "<<< .DependenciesPkg >>>"
 <<< range $pkg, $alias := .Imports >>>
@@ -50,7 +50,7 @@ var C = func(i interface{}) *Container {
 // The SubContainer() method should be called to get a Container in a more specific scope.
 func NewContainer(scopes ...string) (*Container, error) {
 	if dingo.Version != "1" {
-		return nil, dingoerrors.New("The generated code requires github.com/sarulabs/dingo/v2 at version 1, but got version " + dingo.Version)
+		return nil, dingoerrors.New("The generated code requires github.com/sarulabs/dingo/v3 at version 1, but got version " + dingo.Version)
 	}
 
 	if len(scopes) == 0 {

@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/gobuffalo/packr"
-	"github.com/sarulabs/dingo/v2/generation/tools"
+	"github.com/sarulabs/dingo/v3/generation/tools"
 )
 
 // NewGenerator is the Generator constructor.

@@ -11,7 +11,7 @@ import (
 	"reflect"
 	"sort"
 
-	"github.com/sarulabs/dingo/v2"
+	"github.com/sarulabs/dingo/v3"
 	"<<< .DumpedDefsPkg >>>"
 )
 
