@@ -138,11 +138,14 @@ func (c *Container) SafeGet(name string) (interface{}, error) {
 // Get is similar to SafeGet but it does not return the error.
 // Instead it panics.
 func (c *Container) Get(name string) interface{} {
-	o, err := c.ctn.SafeGet(name)
-	if err != nil {
-		panic(err)
-	}
-	return o
+	return c.ctn.Get(name)
+}
+
+// Fill is similar to SafeGet but it does not return the object.
+// Instead it fills the provided object with the value returned by SafeGet.
+// The provided object must be a pointer to the value returned by SafeGet.
+func (c *Container) Fill(name string, dst interface{}) error {
+	return c.ctn.Fill(name, dst)
 }
 
 // UnscopedSafeGet retrieves an object from the Container, like SafeGet.
@@ -158,11 +161,12 @@ func (c *Container) UnscopedSafeGet(name string) (interface{}, error) {
 // UnscopedGet is similar to UnscopedSafeGet but it does not return the error.
 // Instead it panics.
 func (c *Container) UnscopedGet(name string) interface{} {
-	o, err := c.ctn.UnscopedSafeGet(name)
-	if err != nil {
-		panic(err)
-	}
-	return o
+	return c.ctn.UnscopedGet(name)
+}
+
+// UnscopedFill is similar to UnscopedSafeGet but copies the object in dst instead of returning it.
+func (c *Container) UnscopedFill(name string, dst interface{}) error {
+	return c.ctn.UnscopedFill(name, dst)
 }
 
 // Clean deletes the sub-container created by UnscopedSafeGet, UnscopedGet or UnscopedFill.
