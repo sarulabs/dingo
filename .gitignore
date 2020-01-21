@@ -1,2 +1,4 @@
 /tests/app/generated_services
 /dingo/dingo
+vendor
+.idea

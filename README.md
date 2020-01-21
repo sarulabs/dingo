@@ -44,13 +44,19 @@ The disadvantage is that the code must be generated. But this can be compensated
 You can use `go get` to install the latest dingo binary:
 
 ```sh
-go get -u github.com/sarulabs/dingo/dingo
+go get -u github.com/sarulabs/dingo/v3/dingo
 ```
 
-In your project, you need to import `github.com/sarulabs/dingo` to write your objects definitions:
+You can check installed binary version with
 
 ```sh
-go get github.com/sarulabs/dingo
+dingo version
+```
+
+In your project, you need to import `github.com/sarulabs/dingo/v3` to write your objects definitions:
+
+```sh
+go get github.com/sarulabs/dingo/v3
 ```
 
 
@@ -299,6 +305,8 @@ interface {
     func SubContainer() (*Container, error) {
     func SafeGet(name string) (interface{}, error) {
     func Get(name string) interface{} {
+    func Fill(name string, dst interface) error {
+    func Put(name string, dst interface) error {
     func UnscopedSafeGet(name string) (interface{}, error) {
     func UnscopedGet(name string) interface{} {
     func Clean() error {
@@ -344,8 +352,61 @@ The name conversion follow these rules:
 
 For example `--apple--orange--2--PERRY--` would become `AppleOrange2PERRY`.
 
-Note that you can not have a name beginning by a digit.
+Note that you can not have a name beginning by a digit
 
+## Put function
+`Put` is a generic function that will replace object in container by the one you provided.
+It is suitable for tests, when you need to replace one dependency in the middle of your dependency graph.
+
+Imagine, that we have some user fetcher definition, which depend on user repository interface
+```go
+var UserRepositoryDefinition = &dingo.Def{
+	Name:  "user-repository",
+	Scope: dingo.App,
+	Build: func(conn *sql.DB) (interfaces.UserRepository, error) {
+		return NewUserRepo(conn), nil
+	},
+	Params: dingo.Params{
+		"0": dingo.Service("sql-conn"),
+	},
+}
+
+var UserFetcherDefinition = &dingo.Def{
+	Name:  "user-fetcher",
+	Scope: dingo.App,
+	Build: func(userRepo interfaces.UserRepository) (interfaces.UserFetcher, error) {
+		return NewUserFetcher(userRepo), nil
+	},
+	Params: dingo.Params{
+		"0": dingo.Service("user-repository"),
+	},
+}
+``` 
+After running code generator, we will be able to get user fetcher with resolved user repository.
+But in test we want to mock user repository to control it. This is where `Put` method we will come in handy.
+
+```go
+func Test() error {
+	container, err := dic.NewContainer(dingo.App)
+	if err != nil {
+		return err
+	}
+
+	// create mock for user repository
+	// mock should implement UserRepository interface or we will cause panic on container.GetUserFetcher call
+	userRepoMock := &user.RepoMock{}
+
+	// replace user-repository in container with mock
+	if err := container.Put("user-repository", userRepoMock); err != nil {
+		return err
+	}
+
+	fetcher := container.GetUserFetcher()
+	// user fetcher now depend on mock instead of real user repository object
+
+	return nil
+}
+```
 
 ## C function
 
@@ -419,4 +480,15 @@ func (w http.ResponseWriter, r *http.Request) {
     // That is why it can create the object.
     obj := dic.MyObject(r)
 }
+```
+
+### Fill function
+
+The last method to retrieve an object is `Fill`.
+It returns an error if something goes wrong like `SafeGet`, but it may be more practical in some situations.
+It uses reflection to fill the given object. Using reflection makes it is slower than `SafeGet`.
+
+```go
+var object *MyObject
+err := ctn.Fill("my-object", &object)
 ```

@@ -35,7 +35,7 @@ var C = func(i interface{}) *Container {
 	if !ok {
 		panic("could not get the container with C()")
 	}
-	
+
 	c, ok := r.Context().Value(dingo.ContainerKey("dingo")).(*Container)
 	if !ok {
 		panic("could not get the container from the given *http.Request")
@@ -146,6 +146,11 @@ func (c *Container) Get(name string) interface{} {
 // The provided object must be a pointer to the value returned by SafeGet.
 func (c *Container) Fill(name string, dst interface{}) error {
 	return c.ctn.Fill(name, dst)
+}
+
+// Put places destination object to the container by key
+func (c *Container) Put(name string, dst interface{}) error {
+	return c.ctn.Put(name, dst)
 }
 
 // UnscopedSafeGet retrieves an object from the Container, like SafeGet.

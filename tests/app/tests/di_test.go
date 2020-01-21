@@ -25,3 +25,17 @@ func TestDi(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "3", obj3.Value)
 }
+
+
+func TestPut(t *testing.T) {
+	type diTestType struct {}
+
+	container, err := dic.NewContainer()
+	require.Nil(t, err)
+
+	var testType = &diTestType{}
+	err = container.Put("test_di_1", testType)
+	assert.Nil(t, err)
+	t2 := container.Get("test_di_1")
+	assert.Equal(t, t2, testType)
+}

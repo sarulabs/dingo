@@ -19,6 +19,7 @@ type container struct {
 	*containerLineage
 	*containerSlayer
 	*containerGetter
+	*containerPlacer
 	*containerUnscopedGetter
 }
 
@@ -40,6 +41,10 @@ func (ctn *container) Get(name string) interface{} {
 
 func (ctn *container) Fill(name string, dst interface{}) error {
 	return ctn.containerGetter.Fill(ctn, name, dst)
+}
+
+func (ctn *container) Put(name string, dst interface{}) error {
+	return ctn.containerPlacer.put(ctn, name, dst)
 }
 
 func (ctn *container) UnscopedSafeGet(name string) (interface{}, error) {

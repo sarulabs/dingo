@@ -48,6 +48,9 @@ type Container interface {
 	// The provided object must be a pointer to the value returned by SafeGet.
 	Fill(name string, dst interface{}) error
 
+	// Put places destination object to the container by key
+	Put(name string, dst interface{}) error
+
 	// UnscopedSafeGet retrieves an object from the Container, like SafeGet.
 	// The difference is that the object can be retrieved
 	// even if it belongs to a more specific scope.
