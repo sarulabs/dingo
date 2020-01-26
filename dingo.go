@@ -1,14 +1,5 @@
 package dingo
 
-// App is the name of the application scope.
-const App = "app"
-
-// Request is the name of the request scope.
-const Request = "request"
-
-// SubRequest is the name of the subrequest scope.
-const SubRequest = "subrequest"
-
 // Def is the structure containing a service definition.
 type Def struct {
 	Name  string
@@ -50,12 +41,8 @@ type Service string
 // Setting the entry to AutoFill(false) will let the field empty in the structure.
 type AutoFill bool
 
-// Version is used by the dingo command to ensure that
-// the github.com/sarulabs/dingo/v3/dingo package
-// is in the right version inside your project.
-const Version = "1"
-
-// ContainerKey is a type that can be used to store a container
-// in the Context of an http.Request.
-// By default, it is used in the generated C function.
+// ContainerKey is a type that can be used as key in a context.Context.
+// For example it can be use if you want to store
+// a container in the Context of an http.Request.
+// It is used in the generated C function.
 type ContainerKey string

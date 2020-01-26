@@ -4,16 +4,11 @@ set -e
 
 testsDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-echo ">>> GENERATING CODE..."
-cd $testsDir/app
-go run main.go
+echo ">>> GENERATING CODE ..."
+go run "${testsDir}/app/main.go" "${testsDir}/app/generated"
 
-echo ">>> RUNNING TESTS..."
-cd $testsDir/app/tests
-go test -v .
+echo ">>> RUNNING TESTS ..."
+go test -v "${testsDir}/app/tests"
 
-# echo ">>> REMOVING GENERATED CODE..."
-cd $testsDir/app
-rm -rf generated_services
-echo "directory $testsDir/app/generated_services was removed"
-
+echo ">>> REMOVING GENERATED CODE from ${testsDir}/app/generated ..."
+rm -rf "${testsDir}/app/generated"

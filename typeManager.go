@@ -1,4 +1,4 @@
-package tools
+package dingo
 
 import (
 	"errors"
@@ -7,6 +7,15 @@ import (
 	"strconv"
 	"strings"
 )
+
+var reservedPkgNames = map[string]struct{}{
+	"dingo":       struct{}{},
+	"di":          struct{}{},
+	"providerPkg": struct{}{},
+	"errors":      struct{}{},
+	"fmt":         struct{}{},
+	"http":        struct{}{},
+}
 
 // RegisteredType is the representation of a type.
 // It contains the type name and how to write
@@ -201,8 +210,6 @@ func (tm *TypeManager) addImport(pkg string) string {
 		return ""
 	}
 
-	pkg = tm.removeVendor(pkg)
-
 	if alias, ok := tm.imports[pkg]; ok {
 		return alias
 	}
@@ -220,7 +227,7 @@ func (tm *TypeManager) addImport(pkg string) string {
 func (tm *TypeManager) createAlias(pkg string) string {
 	name := FormatPkgName(path.Base(pkg))
 
-	if strings.HasPrefix(name, "dingo") {
+	if _, ok := reservedPkgNames[name]; ok {
 		name = "alias" + name
 	}
 
@@ -237,14 +244,4 @@ func (tm *TypeManager) createAlias(pkg string) string {
 	}
 
 	return name
-}
-
-func (tm *TypeManager) removeVendor(pkg string) string {
-	parts := strings.Split(pkg, "/vendor/")
-
-	if len(parts) < 2 {
-		return pkg
-	}
-
-	return parts[len(parts)-1]
 }

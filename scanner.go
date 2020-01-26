@@ -1,10 +1,9 @@
-package tools
+package dingo
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
-
-	"github.com/sarulabs/dingo/v3"
 )
 
 // Scanner analyzes the definitions provided by a Provider.
@@ -19,6 +18,10 @@ func (s *Scanner) Scan() (*Scan, error) {
 	s.scan = &Scan{
 		TypeManager: &TypeManager{},
 		Defs:        []*ScannedDef{},
+	}
+
+	if err := s.loadProvider(); err != nil {
+		return nil, err
 	}
 
 	for _, name := range s.Provider.Names() {
@@ -41,7 +44,26 @@ func (s *Scanner) Scan() (*Scan, error) {
 	return s.scan, nil
 }
 
-func (s *Scanner) scanDef(def *dingo.Def) error {
+func (s *Scanner) loadProvider() error {
+	providerType := reflect.TypeOf(s.Provider)
+
+	if providerType.Kind() != reflect.Ptr || providerType.Elem().Kind() != reflect.Struct {
+		return errors.New("the Provider must be a pointer to a structure")
+	}
+
+	s.Provider = reflect.New(providerType.Elem()).Interface().(Provider)
+
+	s.scan.ProviderPackage = providerType.Elem().PkgPath()
+	s.scan.ProviderName = providerType.Elem().Name()
+
+	if err := s.Provider.Load(); err != nil {
+		return fmt.Errorf("could not load definitions with Provider.Load(): %v", err)
+	}
+
+	return nil
+}
+
+func (s *Scanner) scanDef(def *Def) error {
 	sDef := &ScannedDef{
 		Def:           def,
 		Name:          def.Name,
@@ -66,7 +88,7 @@ func (s *Scanner) scanDef(def *dingo.Def) error {
 	return nil
 }
 
-func (s *Scanner) scanBuild(def *dingo.Def, scannedDef *ScannedDef) error {
+func (s *Scanner) scanBuild(def *Def, scannedDef *ScannedDef) error {
 	t := reflect.TypeOf(def.Build)
 
 	if t.Kind() == reflect.Func {
@@ -80,7 +102,7 @@ func (s *Scanner) scanBuild(def *dingo.Def, scannedDef *ScannedDef) error {
 	return errors.New("Build should be a function or a pointer to a structure")
 }
 
-func (s *Scanner) scanBuildFunc(def *dingo.Def, scannedDef *ScannedDef, buildT reflect.Type) error {
+func (s *Scanner) scanBuildFunc(def *Def, scannedDef *ScannedDef, buildT reflect.Type) error {
 	if err := s.checkBuildFunc(buildT); err != nil {
 		return err
 	}
@@ -119,7 +141,7 @@ func (s *Scanner) checkBuildFunc(t reflect.Type) error {
 	return nil
 }
 
-func (s *Scanner) scanBuildStruct(def *dingo.Def, scannedDef *ScannedDef, buildT reflect.Type) error {
+func (s *Scanner) scanBuildStruct(def *Def, scannedDef *ScannedDef, buildT reflect.Type) error {
 	buildType, err := s.scan.TypeManager.Register(buildT.Elem())
 	if err != nil {
 		return err
@@ -138,7 +160,7 @@ func (s *Scanner) scanBuildStruct(def *dingo.Def, scannedDef *ScannedDef, buildT
 	return nil
 }
 
-func (s *Scanner) scanClose(def *dingo.Def, scannedDef *ScannedDef) error {
+func (s *Scanner) scanClose(def *Def, scannedDef *ScannedDef) error {
 	if def.Close == nil {
 		return nil
 	}
@@ -162,7 +184,7 @@ func (s *Scanner) scanClose(def *dingo.Def, scannedDef *ScannedDef) error {
 	return s.scanCloseParameter(def, scannedDef, t)
 }
 
-func (s *Scanner) scanCloseParameter(def *dingo.Def, scannedDef *ScannedDef, closeT reflect.Type) error {
+func (s *Scanner) scanCloseParameter(def *Def, scannedDef *ScannedDef, closeT reflect.Type) error {
 	fType, err := s.scan.TypeManager.Register(closeT)
 	if err != nil {
 		return err

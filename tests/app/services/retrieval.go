@@ -1,24 +1,25 @@
 package services
 
 import (
-	"github.com/sarulabs/dingo/v3"
-	"github.com/sarulabs/dingo/v3/tests/app/pkg"
+	"github.com/sarulabs/di/v2"
+	"github.com/sarulabs/dingo/v4"
+	"github.com/sarulabs/dingo/v4/tests/app/models"
 )
 
 // RetrievalDecls is used in the tests.
 var RetrievalDecls = []dingo.Def{
 	{
 		Name:  "test_retrieval_1",
-		Scope: dingo.App,
-		Build: func() (*pkg.RetrievalTest, error) {
-			return pkg.NewRetrievalTest(), nil
+		Scope: di.App,
+		Build: func() (*models.RetrievalTest, error) {
+			return models.NewRetrievalTest(), nil
 		},
 	},
 	{
 		Name:  "test_retrieval_2",
-		Scope: dingo.Request,
-		Build: func() (*pkg.RetrievalTest, error) {
-			return pkg.NewRetrievalTest(), nil
+		Scope: di.Request,
+		Build: func() (*models.RetrievalTest, error) {
+			return models.NewRetrievalTest(), nil
 		},
 	},
 }

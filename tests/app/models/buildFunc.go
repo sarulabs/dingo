@@ -1,4 +1,4 @@
-package pkg
+package models
 
 // BuildFuncTestA is a structure used in the tests.
 type BuildFuncTestA struct {

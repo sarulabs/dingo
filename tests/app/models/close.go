@@ -1,4 +1,4 @@
-package pkg
+package models
 
 // CloseTest is a structure used in the tests.
 type CloseTest struct {

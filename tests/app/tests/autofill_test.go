@@ -3,8 +3,8 @@ package main
 import (
 	"testing"
 
-	"github.com/sarulabs/dingo/v3/tests/app/pkg"
-	"github.com/sarulabs/dingo/v3/tests/app/generated_services/dic"
+	"github.com/sarulabs/dingo/v4/tests/app/generated/dic"
+	"github.com/sarulabs/dingo/v4/tests/app/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -13,9 +13,9 @@ func TestAutofill(t *testing.T) {
 	container, err := dic.NewContainer()
 	require.Nil(t, err)
 
-	expected1 := &pkg.AutofillTestA{Value: "A1"}
-	expected2 := &pkg.AutofillTestA{Value: "A2"}
-	expected3 := &pkg.AutofillTestB{Value: expected2}
+	expected1 := &models.AutofillTestA{Value: "A1"}
+	expected2 := &models.AutofillTestA{Value: "A2"}
+	expected3 := &models.AutofillTestB{Value: expected2}
 
 	assert.Equal(t, expected1, container.GetTestAutofill1())
 	assert.Equal(t, expected2, container.GetTestAutofill2())
