@@ -3,8 +3,8 @@ package main
 import (
 	"testing"
 
-	"github.com/sarulabs/dingo/v3/tests/app/pkg"
-	"github.com/sarulabs/dingo/v3/tests/app/generated_services/dic"
+	"github.com/sarulabs/dingo/v4/tests/app/generated/dic"
+	"github.com/sarulabs/dingo/v4/tests/app/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -13,10 +13,10 @@ func TestBuildFunc(t *testing.T) {
 	container, err := dic.NewContainer()
 	require.Nil(t, err)
 
-	expected3 := &pkg.BuildFuncTestC{P1: "C"}
-	expected2 := pkg.BuildFuncTestB{P1: "B", P2: expected3}
-	expected1 := &pkg.BuildFuncTestA{P1: "A", P2: expected2, P3: expected3}
-	expected4 := &pkg.BuildFuncTestA{P1: "9999", P2: pkg.BuildFuncTestB{P1: "value", P2: expected3}, P3: expected3}
+	expected3 := &models.BuildFuncTestC{P1: "C"}
+	expected2 := models.BuildFuncTestB{P1: "B", P2: expected3}
+	expected1 := &models.BuildFuncTestA{P1: "A", P2: expected2, P3: expected3}
+	expected4 := &models.BuildFuncTestA{P1: "9999", P2: models.BuildFuncTestB{P1: "value", P2: expected3}, P3: expected3}
 
 	assert.Equal(t, expected1, container.GetTestBuildFunc1())
 	assert.Equal(t, expected2, container.GetTestBuildFunc2())

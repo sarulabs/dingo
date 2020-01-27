@@ -1,24 +1,25 @@
 package services
 
 import (
-	"github.com/sarulabs/dingo/v3"
-	"github.com/sarulabs/dingo/v3/tests/app/pkg"
+	"github.com/sarulabs/di/v2"
+	"github.com/sarulabs/dingo/v4"
+	"github.com/sarulabs/dingo/v4/tests/app/models"
 )
 
 // ScopeDecls is used in the tests.
 var ScopeDecls = []dingo.Def{
 	{
 		Name:  "test_scope_1",
-		Scope: dingo.App,
-		Build: func() (*pkg.ScopeTest, error) {
-			return pkg.NewScopeTest(), nil
+		Scope: di.App,
+		Build: func() (*models.ScopeTest, error) {
+			return models.NewScopeTest(), nil
 		},
 	},
 	{
 		Name:  "test_scope_2",
-		Scope: dingo.Request,
-		Build: func() (*pkg.ScopeTest, error) {
-			return pkg.NewScopeTest(), nil
+		Scope: di.Request,
+		Build: func() (*models.ScopeTest, error) {
+			return models.NewScopeTest(), nil
 		},
 	},
 }

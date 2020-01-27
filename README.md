@@ -5,12 +5,11 @@ Generation of dependency injection containers for go programs (golang).
 **Dingo** is a code generator. It generates dependency injection containers based on [sarulabs/di](https://github.com/sarulabs/di).
 
 It is better than [sarulabs/di](https://github.com/sarulabs/di) alone because:
+
 - Generated containers have **typed** methods to retrieve each object. You do not need to cast them before they can be used. That implies less runtime errors.
 - Definitions are easy to write. Some dependencies can be guessed, allowing **shorter definitions**.
 
 The disadvantage is that the code must be generated. But this can be compensated by the use of a file watcher.
-
-
 
 # Table of contents
 
@@ -19,11 +18,12 @@ The disadvantage is that the code must be generated. But this can be compensated
 [![codebeat badge](https://codebeat.co/badges/833d6016-e4dd-482f-bcfe-210a1be48b94)](https://codebeat.co/projects/github-com-sarulabs-dingo-master)
 [![goreport](https://goreportcard.com/badge/github.com/sarulabs/dingo)](https://goreportcard.com/report/github.com/sarulabs/dingo)
 
-- [Installation](#installation)
-- [Usage](#usage)
+- [Dependencies](#dependencies)
 - [Similarities with di](#similarities-with-di)
-- [Definitions](#definitions)
+- [Setup](#setup)
     * [Code structure](#code-structure)
+    * [Generating the code](#generating-the-code)
+- [Definitions](#definitions)
     * [Name and scope](#name-and-scope)
     * [Build based on a structure](#build-based-on-a-structure)
     * [Build based on a function](#build-based-on-a-function)
@@ -36,73 +36,41 @@ The disadvantage is that the code must be generated. But this can be compensated
     * [Logging errors](#logging-errors)
     * [C function](#c-function)
     * [Retrieval functions](#retrieval-functions)
+- [Upgrade from v3](#upgrade-from-v3)
 
+# Dependencies
 
-
-# Installation
-
-You can use `go get` to install the latest dingo binary:
-
-```sh
-go get -u github.com/sarulabs/dingo/dingo
-```
-
-In your project, you need to import `github.com/sarulabs/dingo` to write your objects definitions:
-
-```sh
-go get github.com/sarulabs/dingo
-```
-
-
-
-# Usage
-
-There is only one way to use `dingo`:
-
-```sh
-dingo -src="$projectDir/services" -dest="$projectDir/generatedServices"
-````
-
-- **src**: the directory containing your definitions
-- **dest**: the directory where the code will be generated
-
-There is no watch mode included in dingo. You need to bring your own file watcher.
-
-
+This module depends on `github.com/sarulabs/di/v2`. You will need it to generate and use the dependency injection container.
 
 # Similarities with di
 
-Dingo is very similar to [sarulabs/di](https://github.com/sarulabs/di). This documentation mostly covers the differences between the two libraries. You probably should read the di documentation before going further.
+Dingo is very similar to [sarulabs/di](https://github.com/sarulabs/di) as it mainly a wrapper around it. This documentation mostly covers the differences between the two libraries. You probably should read the di documentation before going further.
 
-
-
-# Definitions
+# Setup
 
 ## Code structure
 
-The definitions must be in a single directory. They must be contained in go files, and the package name must be the same as the directory name.
+You will have to write the service definitions and register them in a `Provider`. The recommended structure to organize the code is the following:
 
-A definition is a `dingo.Def` from the `github.com/sarulabs/dingo` package.
+```txt
+- services/
+    - provider/
+        - provider.go
+    - servicesA.go
+    - servicesB.go
+```
 
-The definitions must be contained in public variables. The allowed types for these variables are:
-
-- `dingo.Def`
-- `*dingo.Def`
-- `[]dingo.Def`
-- `[]*dingo.Def`
-- `func() dingo.Def`
-- `func() *dingo.Def`
-- `func() []dingo.Def`
-- `func() []*dingo.Def`
-
-A definition file should look like this:
+In the service files, you can write the service definitions:
 
 ```go
+// servicesA.go
 package services
 
-import "github.com/sarulabs/dingo"
+import (
+	"github.com/sarulabs/dingo/v4"
+)
 
-var MyDefinitions = []dingo.Def{
+var ServicesADefs = []dingo.Def{
     {
         Name: "definition-1",
         // ...
@@ -114,14 +82,79 @@ var MyDefinitions = []dingo.Def{
 }
 ```
 
+In the provider file, the definitions are registered with the `Load` method.
+
+```go
+// provider.go
+package provider
+
+import (
+	"github.com/sarulabs/dingo/v4"
+	services "YOUR_OWN_SERVICES_PACKAGE"
+)
+
+// Redefine your own provider by overriding the Load method of the dingo.BaseProvider.
+type Provider struct {
+	dingo.BaseProvider
+}
+
+func (p *Provider) Load() error {
+	if err := p.AddDefSlice(services.ServicesADefs); err != nil {
+		return err
+    }
+    if err := p.AddDefSlice(services.ServicesBDefs); err != nil {
+		return err
+	}
+	return nil
+}
+```
+
+An example of this can be found in the `tests` directory.
+
+## Generating the code
+
+You will need to create your own command to generate the container. You can adapt the following code:
+
+```go
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"github.com/sarulabs/dingo/v4"
+	provider "YOUR_OWN_PROVIDER_PACKAGE"
+)
+
+func main() {
+	if len(os.Args) != 2 {
+		fmt.Println("usage: go run main.go path/to/output/directory")
+		os.Exit(1)
+	}
+
+	err := dingo.GenerateContainer((*provider.Provider)(nil), os.Args[1])
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+}
+```
+
+Running the following command will generate the code in the `path/to/generated/code` directory:
+
+```sh
+go run main.go path/to/generated/code
+```
+
+# Definitions
+
 ## Name and scope
 
 Dingo definitions are not that different from [sarulabs/di](https://github.com/sarulabs/di) definitions.
 
 They have a `name` and a `scope`. For more information about scopes, refer to the documentation of [sarulabs/di](https://github.com/sarulabs/di).
 
-The default scopes are `dingo.App`, `dingo.Request` and `dingo.SubRequest`.
-
+The default scopes are `di.App`, `di.Request` and `di.SubRequest`.
 
 ## Build based on a structure
 
@@ -155,14 +188,13 @@ dingo.Def{
         "FieldB": "value",
     },
 }
-````
+```
 
 `dingo.Params` is a `map[string]interface{}`. The key is the name of the field. The value is the one that the associated field should take.
 
 You can use `dingo.Service` to use another object registered in the container.
 
 Some fields can be omitted like `FieldC`. In this case, the field will have the default value `0`. But it may have a different behaviour. See the [parameters](#parameters) section to understand why.
-
 
 ## Build based on a function
 
@@ -196,12 +228,11 @@ dingo.Def{
         "0": dingo.Service("my-object"),
     },
 }
-````
+```
 
 The build function can actually take as many input parameters as needed. In `Def.Params` you can define their values.
 
 The key is the index of the input parameter.
-
 
 ## Parameters
 
@@ -225,7 +256,7 @@ dingo.Def{
         }, nil
     },
 }
-````
+```
 
 It works well for specific structures. But for basic types it can become a little bit risky. Thus it is better to only store pointers to structures in the container and avoid types like `string` or `int`.
 
@@ -242,8 +273,7 @@ dingo.Def{
         "FieldA": dingo.AutoFill(false),
     },
 }
-````
-
+```
 
 ## Close function
 
@@ -262,7 +292,6 @@ dingo.Def{
 }
 ```
 
-
 ## Avoid automatic filling
 
 Each definition in the container is a candidate to automatically fill another (if its parameters are not specified).
@@ -279,8 +308,6 @@ dingo.Def{
 
 This can be useful if you have more than one object of a given type, but one should be used by default to automatically fill the other definitions. Use `Def.NotForAutoFill` on the definition you do not want to use automatically.
 
-
-
 # Generated container
 
 ## Basic container
@@ -291,22 +318,24 @@ It implements this interface:
 
 ```go
 interface {
-    func Scope() string {
-    func Scopes() []string {
-    func ParentScopes() []string {
-    func SubScopes() []string {
-    func Parent() *Container {
-    func SubContainer() (*Container, error) {
-    func SafeGet(name string) (interface{}, error) {
-    func Get(name string) interface{} {
-    func UnscopedSafeGet(name string) (interface{}, error) {
-    func UnscopedGet(name string) interface{} {
-    func Clean() error {
-    func DeleteWithSubContainers() error {
-    func Delete() error {
-    func IsClosed() bool {
+    Scope() string
+    Scopes() []string
+    ParentScopes() []string
+    SubScopes() []string
+    Parent() *Container
+    SubContainer() (*Container, error)
+    SafeGet(name string) (interface{}, error)
+    Get(name string) interface{}
+    Fill(name string, dst interface{}) error
+    UnscopedSafeGet(name string) (interface{}, error)
+    UnscopedGet(name string) interface{}
+    UnscopedFill(name string, dst interface{}) error
+    Clean() error
+    DeleteWithSubContainers() error
+    Delete() error
+    IsClosed() bool
 }
-````
+```
 
 To create the container, there is the `NewContainer` function:
 
@@ -314,8 +343,9 @@ To create the container, there is the `NewContainer` function:
 func NewContainer(scopes ...string) (*Container, error)
 ```
 
-You need to specify the scopes. By default `dingo.App`, `dingo.Request` and `dingo.SubRequest` are used.
+You need to specify the scopes. By default `di.App`, `di.Request` and `di.SubRequest` are used.
 
+A `NewBuilder` function is also available. It allows you to redefine some services (`Add` and `Set` methods) before generating the container with its `Build` method. It is not recommended but can be useful for testing.
 
 ## Additional methods
 
@@ -332,7 +362,7 @@ interface {
     UnscopedSafeGetMyObject() (*MyObject, error)
     UnscopedGetMyObject() *MyObject
 }
-````
+```
 
 `my-object` has been converted to `MyObject`.
 
@@ -346,12 +376,12 @@ For example `--apple--orange--2--PERRY--` would become `AppleOrange2PERRY`.
 
 Note that you can not have a name beginning by a digit.
 
-
 ## C function
 
 There is also a `C` function in the dic package. Its role is to turn an interface into a `*Container`.
 
 By default, the `C` function can:
+
 - cast a container into a `*Container` if it is possible
 - retrieve a `*Container` from the context of an `*http.Request` (the key being `dingo.ContainerKey("dingo")`)
 
@@ -364,7 +394,6 @@ dic.C = func(i interface{}) *Container {
 ```
 
 The `C` function is used in retrieval functions.
-
 
 ## Retrieval functions
 
@@ -420,3 +449,8 @@ func (w http.ResponseWriter, r *http.Request) {
     obj := dic.MyObject(r)
 }
 ```
+
+# Upgrade from v3
+
+- You need to register the definitions in a `Provider`. The `dingo` binary is also not available anymore as it would depends on the `Provider` now. So you have to write it yourself. See the [Setup](#setup) section.
+- `dingo.App`, `dingo.Request` and `dingo.SubRequest` have been removed. Use `di.App`, `di.Request` and `di.SubRequest` instead.

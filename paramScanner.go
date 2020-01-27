@@ -1,4 +1,4 @@
-package tools
+package dingo
 
 import (
 	"errors"
@@ -6,8 +6,6 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-
-	"github.com/sarulabs/dingo/v3"
 )
 
 // ParamScanner helps the Scanner.
@@ -136,11 +134,11 @@ func (s *ParamScanner) setParam(param *ParamInfo, def *ScannedDef) error {
 		return s.autofill(param, !def.BuildIsFunc)
 	}
 
-	if v, ok := p.(dingo.Service); ok {
+	if v, ok := p.(Service); ok {
 		return s.setServiceParam(param, string(v))
 	}
 
-	autofill, ok := p.(dingo.AutoFill)
+	autofill, ok := p.(AutoFill)
 	if ok && bool(autofill) {
 		return s.autofill(param, false)
 	}

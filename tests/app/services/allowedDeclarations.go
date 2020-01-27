@@ -1,31 +1,31 @@
 package services
 
 import (
-	"github.com/sarulabs/dingo/v3"
-	"github.com/sarulabs/dingo/v3/tests/app/pkg"
+	"github.com/sarulabs/dingo/v4"
+	"github.com/sarulabs/dingo/v4/tests/app/models"
 )
 
 // StructDecl is used in the tests.
 var StructDecl = dingo.Def{
 	Name:  "test_decl_type_0",
-	Build: (*pkg.DeclTypeTest)(nil),
+	Build: (*models.DeclTypeTest)(nil),
 }
 
 // PtrDecl is used in the tests.
 var PtrDecl = &dingo.Def{
 	Name:  "test_decl_type_1",
-	Build: (*pkg.DeclTypeTest)(nil),
+	Build: (*models.DeclTypeTest)(nil),
 }
 
 // StructSliceDecls is used in the tests.
 var StructSliceDecls = []dingo.Def{
 	{
 		Name:  "test_decl_type_2",
-		Build: (*pkg.DeclTypeTest)(nil),
+		Build: (*models.DeclTypeTest)(nil),
 	},
 	{
 		Name:  "test_decl_type_3",
-		Build: (*pkg.DeclTypeTest)(nil),
+		Build: (*models.DeclTypeTest)(nil),
 	},
 }
 
@@ -33,11 +33,11 @@ var StructSliceDecls = []dingo.Def{
 var PtrSliceDecls = []*dingo.Def{
 	{
 		Name:  "test_decl_type_4",
-		Build: (*pkg.DeclTypeTest)(nil),
+		Build: (*models.DeclTypeTest)(nil),
 	},
 	{
 		Name:  "test_decl_type_5",
-		Build: (*pkg.DeclTypeTest)(nil),
+		Build: (*models.DeclTypeTest)(nil),
 	},
 }
 
@@ -45,7 +45,7 @@ var PtrSliceDecls = []*dingo.Def{
 var StructFuncDecl = func() dingo.Def {
 	return dingo.Def{
 		Name:  "test_decl_type_6",
-		Build: (*pkg.DeclTypeTest)(nil),
+		Build: (*models.DeclTypeTest)(nil),
 	}
 }
 
@@ -53,7 +53,7 @@ var StructFuncDecl = func() dingo.Def {
 var PtrFuncDecl = func() *dingo.Def {
 	return &dingo.Def{
 		Name:  "test_decl_type_7",
-		Build: (*pkg.DeclTypeTest)(nil),
+		Build: (*models.DeclTypeTest)(nil),
 	}
 }
 
@@ -62,11 +62,11 @@ var StructSliceFuncDecls = func() []dingo.Def {
 	return []dingo.Def{
 		{
 			Name:  "test_decl_type_8",
-			Build: (*pkg.DeclTypeTest)(nil),
+			Build: (*models.DeclTypeTest)(nil),
 		},
 		{
 			Name:  "test_decl_type_9",
-			Build: (*pkg.DeclTypeTest)(nil),
+			Build: (*models.DeclTypeTest)(nil),
 		},
 	}
 }
@@ -76,11 +76,11 @@ var PtrSliceFuncDecls = func() []*dingo.Def {
 	return []*dingo.Def{
 		{
 			Name:  "test_decl_type_10",
-			Build: (*pkg.DeclTypeTest)(nil),
+			Build: (*models.DeclTypeTest)(nil),
 		},
 		{
 			Name:  "test_decl_type_11",
-			Build: (*pkg.DeclTypeTest)(nil),
+			Build: (*models.DeclTypeTest)(nil),
 		},
 	}
 }

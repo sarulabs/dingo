@@ -1,11 +1,8 @@
-module github.com/sarulabs/dingo/v3
+module github.com/sarulabs/dingo/v4
 
 go 1.12
 
 require (
-	github.com/fatih/color v1.7.0
-	github.com/gobuffalo/packr v1.30.1
-	github.com/mattn/go-colorable v0.1.2 // indirect
-	github.com/pkg/errors v0.8.1
-	github.com/stretchr/testify v1.3.0
+	github.com/sarulabs/di/v2 v2.4.0
+	github.com/stretchr/testify v1.4.0
 )

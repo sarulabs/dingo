@@ -1,4 +1,4 @@
-package pkg
+package models
 
 // AutofillTestA is a structure used in the tests.
 type AutofillTestA struct {
