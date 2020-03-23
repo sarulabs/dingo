@@ -54,7 +54,8 @@ var DefsTemplate = `
 	<<<- if .BuildDependsOnRawDef >>>
 		d, err := provider.Get("<<< .Name >>>")
 		if err != nil {
-			return <<< .EmptyObject >>>, err
+			var eo <<< .ObjectType >>>
+			return eo, err
 		}
 	<<<- end >>>
 	<<<- range $index, $param := .Params >>>
@@ -75,22 +76,25 @@ var DefsTemplate = `
 
 <<< define "buildParam" >>>
 	<<<- if .UndefinedStructParam ->>>
-		p<<< .Index >>> := <<< .Empty >>>
+		var p<<< .Index >>> <<< .Type >>>
 	<<<- else ->>>
 		<<< if ne .ServiceName "" ->>>
 			pi<<< .Index >>>, err := ctn.SafeGet("<<< .ServiceName >>>")
 			if err != nil {
-				return <<< .Def.EmptyObject >>>, err
+				var eo <<< .Def.ObjectType >>>
+				return eo, err
 			}
 		<<< else ->>>
 			pi<<< .Index >>>, ok := d.Params["<<< .Name >>>"]
 			if !ok {
-				return <<< .Def.EmptyObject >>>, errors.New("could not find parameter <<< .Name >>>")
+				var eo <<< .Def.ObjectType >>>
+				return eo, errors.New("could not find parameter <<< .Name >>>")
 			}
 		<<< end ->>>
 		p<<< .Index >>>, ok := pi<<< .Index >>>.(<<< .Type >>>)
 		if !ok {
-			return <<< .Def.EmptyObject >>>, errors.New("could not cast parameter <<< .Name >>> to <<< .Type >>>")
+			var eo <<< .Def.ObjectType >>>
+			return eo, errors.New("could not cast parameter <<< .Name >>> to <<< .Type >>>")
 		}
 	<<<- end ->>>
 <<< end >>>
@@ -103,7 +107,8 @@ var DefsTemplate = `
 <<< define "objectFunc" ->>>
 	b, ok := d.Build.(<<< .BuildType >>>)
 	if !ok {
-		return <<< .EmptyObject >>>, errors.New("could not cast build function to <<< .BuildType >>>")
+		var eo <<< .ObjectType >>>
+		return eo, errors.New("could not cast build function to <<< .BuildType >>>")
 	}
 	return b(<<< .ParamsString >>>)
 <<<- end >>>

@@ -21,7 +21,6 @@ type ScannedDef struct {
 	FormattedName string
 	Scope         string
 	ObjectType    string
-	EmptyObject   string
 	BuildIsFunc   bool
 	BuildType     string
 	Params        map[string]*ParamInfo
@@ -70,7 +69,6 @@ type ParamInfo struct {
 	Index                string
 	ServiceName          string
 	Type                 string
-	Empty                string
 	UndefinedStructParam bool
 	Def                  *ScannedDef
 }

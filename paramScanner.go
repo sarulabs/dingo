@@ -88,8 +88,7 @@ func (s *ParamScanner) expectedFuncParams(def *ScannedDef) (map[string]*ParamInf
 		params[index] = &ParamInfo{
 			Name:  index,
 			Index: index,
-			Type:  pType.Type,
-			Empty: pType.EmptyValue,
+			Type:  pType,
 			Def:   def,
 		}
 	}
@@ -119,8 +118,7 @@ func (s *ParamScanner) expectedStructParams(def *ScannedDef) (map[string]*ParamI
 		params[f.Name] = &ParamInfo{
 			Name:  f.Name,
 			Index: index,
-			Type:  pType.Type,
-			Empty: pType.EmptyValue,
+			Type:  pType,
 			Def:   def,
 		}
 	}
@@ -154,8 +152,8 @@ func (s *ParamScanner) setParam(param *ParamInfo, def *ScannedDef) error {
 		return err
 	}
 
-	if pType.Type != param.Type {
-		return errors.New("param " + param.Name + " should be a " + param.Type + " but is a " + pType.Type)
+	if pType != param.Type {
+		return errors.New("param " + param.Name + " should be a " + param.Type + " but is a " + pType)
 	}
 
 	return nil
