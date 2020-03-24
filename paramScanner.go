@@ -28,7 +28,7 @@ func (s *ParamScanner) Scan(scan *Scan) error {
 	for _, def := range scan.Defs {
 		s.defsByName[def.Name] = def
 		if !def.Def.NotForAutoFill {
-			s.defsByType[def.ObjectType] = append(s.defsByType[def.ObjectType], def)
+			s.defsByType[def.ObjectTypeString] = append(s.defsByType[def.ObjectTypeString], def)
 		}
 	}
 
@@ -86,10 +86,11 @@ func (s *ParamScanner) expectedFuncParams(def *ScannedDef) (map[string]*ParamInf
 		}
 
 		params[index] = &ParamInfo{
-			Name:  index,
-			Index: index,
-			Type:  pType,
-			Def:   def,
+			Name:       index,
+			Index:      index,
+			Type:       t.In(i),
+			TypeString: pType,
+			Def:        def,
 		}
 	}
 
@@ -116,10 +117,11 @@ func (s *ParamScanner) expectedStructParams(def *ScannedDef) (map[string]*ParamI
 		}
 
 		params[f.Name] = &ParamInfo{
-			Name:  f.Name,
-			Index: index,
-			Type:  pType,
-			Def:   def,
+			Name:       f.Name,
+			Index:      index,
+			Type:       f.Type,
+			TypeString: pType,
+			Def:        def,
 		}
 	}
 
@@ -152,24 +154,24 @@ func (s *ParamScanner) setParam(param *ParamInfo, def *ScannedDef) error {
 		return err
 	}
 
-	if pType != param.Type {
-		return errors.New("param " + param.Name + " should be a " + param.Type + " but is a " + pType)
+	if pType != param.TypeString && !s.implementsInterface(reflect.TypeOf(p), param.Type) {
+		return errors.New("param " + param.Name + " should be a " + param.TypeString + " but is a " + pType)
 	}
 
 	return nil
 }
 
 func (s *ParamScanner) autofill(param *ParamInfo, acceptNotFound bool) error {
-	defs, _ := s.defsByType[param.Type]
+	defs, _ := s.defsByType[param.TypeString]
 	if len(defs) == 0 && acceptNotFound {
 		param.UndefinedStructParam = true
 		return nil
 	}
 	if len(defs) == 0 {
-		return fmt.Errorf("autofill require exactly one %s, but found 0 definition with this type", param.Type)
+		return fmt.Errorf("autofill require exactly one %s, but found 0 definition with this type", param.TypeString)
 	}
 	if len(defs) > 1 {
-		return fmt.Errorf("autofill require exactly one %s, but found %d definitions with this type", param.Type, len(defs))
+		return fmt.Errorf("autofill require exactly one %s, but found %d definitions with this type", param.TypeString, len(defs))
 	}
 
 	param.ServiceName = defs[0].Name
@@ -183,11 +185,15 @@ func (s *ParamScanner) setServiceParam(param *ParamInfo, service string) error {
 		return errors.New("could not find definition " + service + " for param " + param.Name)
 	}
 
-	if def.ObjectType != param.Type {
-		return errors.New("param " + param.Name + " should be a " + param.Type + " but is a " + def.ObjectType)
+	if def.ObjectTypeString != param.TypeString && !s.implementsInterface(def.ObjectType, param.Type) {
+		return errors.New("param " + param.Name + " should be a " + param.TypeString + " but is a " + def.ObjectTypeString)
 	}
 
 	param.ServiceName = service
 
 	return nil
+}
+
+func (s *ParamScanner) implementsInterface(t, i reflect.Type) bool {
+	return i.Kind() == reflect.Interface && t.Implements(i)
 }
