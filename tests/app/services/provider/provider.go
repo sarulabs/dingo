@@ -51,6 +51,9 @@ func (p *Provider) Load() error {
 	if err := p.AddDefSlice(services.DiDecls); err != nil {
 		return err
 	}
+	if err := p.AddDefSlice(services.InterfacesDecls); err != nil {
+		return err
+	}
 	if err := p.AddDefSlice(services.RetrievalDecls); err != nil {
 		return err
 	}

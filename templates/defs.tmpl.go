@@ -54,7 +54,7 @@ var DefsTemplate = `
 	<<<- if .BuildDependsOnRawDef >>>
 		d, err := provider.Get("<<< .Name >>>")
 		if err != nil {
-			var eo <<< .ObjectType >>>
+			var eo <<< .ObjectTypeString >>>
 			return eo, err
 		}
 	<<<- end >>>
@@ -76,25 +76,25 @@ var DefsTemplate = `
 
 <<< define "buildParam" >>>
 	<<<- if .UndefinedStructParam ->>>
-		var p<<< .Index >>> <<< .Type >>>
+		var p<<< .Index >>> <<< .TypeString >>>
 	<<<- else ->>>
 		<<< if ne .ServiceName "" ->>>
 			pi<<< .Index >>>, err := ctn.SafeGet("<<< .ServiceName >>>")
 			if err != nil {
-				var eo <<< .Def.ObjectType >>>
+				var eo <<< .Def.ObjectTypeString >>>
 				return eo, err
 			}
 		<<< else ->>>
 			pi<<< .Index >>>, ok := d.Params["<<< .Name >>>"]
 			if !ok {
-				var eo <<< .Def.ObjectType >>>
+				var eo <<< .Def.ObjectTypeString >>>
 				return eo, errors.New("could not find parameter <<< .Name >>>")
 			}
 		<<< end ->>>
-		p<<< .Index >>>, ok := pi<<< .Index >>>.(<<< .Type >>>)
+		p<<< .Index >>>, ok := pi<<< .Index >>>.(<<< .TypeString >>>)
 		if !ok {
-			var eo <<< .Def.ObjectType >>>
-			return eo, errors.New("could not cast parameter <<< .Name >>> to <<< .Type >>>")
+			var eo <<< .Def.ObjectTypeString >>>
+			return eo, errors.New("could not cast parameter <<< .Name >>> to <<< .TypeString >>>")
 		}
 	<<<- end ->>>
 <<< end >>>
@@ -105,10 +105,10 @@ var DefsTemplate = `
 ############################# */>>>
 
 <<< define "objectFunc" ->>>
-	b, ok := d.Build.(<<< .BuildType >>>)
+	b, ok := d.Build.(<<< .BuildTypeString >>>)
 	if !ok {
-		var eo <<< .ObjectType >>>
-		return eo, errors.New("could not cast build function to <<< .BuildType >>>")
+		var eo <<< .ObjectTypeString >>>
+		return eo, errors.New("could not cast build function to <<< .BuildTypeString >>>")
 	}
 	return b(<<< .ParamsString >>>)
 <<<- end >>>
@@ -119,7 +119,7 @@ var DefsTemplate = `
 ############################# */>>>
 
 <<< define "objectNew" ->>>
-	return &<<< .BuildType >>>{
+	return &<<< .BuildTypeString >>>{
 		<<< .ParamsString >>>}, nil
 <<<- end >>>
 
@@ -129,7 +129,7 @@ var DefsTemplate = `
 ############################# */>>>
 
 <<< define "closeBody" >>>
-	<<<- if eq .CloseType "" ->>>
+	<<<- if eq .CloseTypeString "" ->>>
 		{
 			return nil
 		}
@@ -139,13 +139,13 @@ var DefsTemplate = `
 			if err != nil {
 				return err
 			}
-			c, ok := d.Close.(<<< .CloseType >>>)
+			c, ok := d.Close.(<<< .CloseTypeString >>>)
 			if !ok {
-				return errors.New("could not cast close function to '<<< .CloseType >>>'")
+				return errors.New("could not cast close function to '<<< .CloseTypeString >>>'")
 			}
-			o, ok := obj.(<<< .ObjectType >>>)
+			o, ok := obj.(<<< .ObjectTypeString >>>)
 			if !ok {
-				return errors.New("could not cast object to '<<< .ObjectType >>>'")
+				return errors.New("could not cast object to '<<< .ObjectTypeString >>>'")
 			}
 			return c(o)
 		}

@@ -1,6 +1,7 @@
 package dingo
 
 import (
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -16,15 +17,16 @@ type Scan struct {
 
 // ScannedDef contains the parsed information about a service definition.
 type ScannedDef struct {
-	Def           *Def
-	Name          string
-	FormattedName string
-	Scope         string
-	ObjectType    string
-	BuildIsFunc   bool
-	BuildType     string
-	Params        map[string]*ParamInfo
-	CloseType     string
+	Def              *Def
+	Name             string
+	FormattedName    string
+	Scope            string
+	ObjectType       reflect.Type
+	ObjectTypeString string
+	BuildIsFunc      bool
+	BuildTypeString  string
+	Params           map[string]*ParamInfo
+	CloseTypeString  string
 }
 
 // ParamsString returns the parameters as they should appear
@@ -49,7 +51,7 @@ func (def *ScannedDef) ParamsString() string {
 	return params
 }
 
-// BuildDependsOnRawDef returns true if the service contructor
+// BuildDependsOnRawDef returns true if the service constructor
 // needs the definition contained in the Provider.
 func (def *ScannedDef) BuildDependsOnRawDef() bool {
 	if def.BuildIsFunc {
@@ -68,7 +70,8 @@ type ParamInfo struct {
 	Name                 string
 	Index                string
 	ServiceName          string
-	Type                 string
+	Type                 reflect.Type
+	TypeString           string
 	UndefinedStructParam bool
 	Def                  *ScannedDef
 }

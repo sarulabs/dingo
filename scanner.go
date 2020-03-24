@@ -107,7 +107,7 @@ func (s *Scanner) scanBuildFunc(def *Def, scannedDef *ScannedDef, buildT reflect
 		return err
 	}
 
-	buildType, err := s.scan.TypeManager.Register(buildT)
+	BuildTypeString, err := s.scan.TypeManager.Register(buildT)
 	if err != nil {
 		return err
 	}
@@ -117,9 +117,10 @@ func (s *Scanner) scanBuildFunc(def *Def, scannedDef *ScannedDef, buildT reflect
 		return err
 	}
 
-	scannedDef.ObjectType = objType
+	scannedDef.ObjectType = buildT.Out(0)
+	scannedDef.ObjectTypeString = objType
 	scannedDef.BuildIsFunc = true
-	scannedDef.BuildType = buildType
+	scannedDef.BuildTypeString = BuildTypeString
 
 	return nil
 }
@@ -141,7 +142,7 @@ func (s *Scanner) checkBuildFunc(t reflect.Type) error {
 }
 
 func (s *Scanner) scanBuildStruct(def *Def, scannedDef *ScannedDef, buildT reflect.Type) error {
-	buildType, err := s.scan.TypeManager.Register(buildT.Elem())
+	BuildTypeString, err := s.scan.TypeManager.Register(buildT.Elem())
 	if err != nil {
 		return err
 	}
@@ -151,9 +152,10 @@ func (s *Scanner) scanBuildStruct(def *Def, scannedDef *ScannedDef, buildT refle
 		return err
 	}
 
-	scannedDef.ObjectType = objType
+	scannedDef.ObjectType = buildT
+	scannedDef.ObjectTypeString = objType
 	scannedDef.BuildIsFunc = false
-	scannedDef.BuildType = buildType
+	scannedDef.BuildTypeString = BuildTypeString
 
 	return nil
 }
@@ -193,11 +195,11 @@ func (s *Scanner) scanCloseParameter(def *Def, scannedDef *ScannedDef, closeT re
 		return err
 	}
 
-	if pType != scannedDef.ObjectType {
-		return errors.New("object type is " + scannedDef.ObjectType + " but " + pType + " is used is Close")
+	if pType != scannedDef.ObjectTypeString {
+		return errors.New("object type is " + scannedDef.ObjectTypeString + " but " + pType + " is used is Close")
 	}
 
-	scannedDef.CloseType = fType
+	scannedDef.CloseTypeString = fType
 
 	return nil
 }
