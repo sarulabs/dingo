@@ -67,7 +67,7 @@ In the service files, you can write the service definitions:
 package services
 
 import (
-	"github.com/sarulabs/dingo/v4"
+    "github.com/sarulabs/dingo/v4"
 )
 
 var ServicesADefs = []dingo.Def{
@@ -89,23 +89,23 @@ In the provider file, the definitions are registered with the `Load` method.
 package provider
 
 import (
-	"github.com/sarulabs/dingo/v4"
-	services "YOUR_OWN_SERVICES_PACKAGE"
+    "github.com/sarulabs/dingo/v4"
+    services "YOUR_OWN_SERVICES_PACKAGE"
 )
 
 // Redefine your own provider by overriding the Load method of the dingo.BaseProvider.
 type Provider struct {
-	dingo.BaseProvider
+    dingo.BaseProvider
 }
 
 func (p *Provider) Load() error {
-	if err := p.AddDefSlice(services.ServicesADefs); err != nil {
-		return err
+    if err := p.AddDefSlice(services.ServicesADefs); err != nil {
+        return err
     }
     if err := p.AddDefSlice(services.ServicesBDefs); err != nil {
-		return err
-	}
-	return nil
+        return err
+    }
+    return nil
 }
 ```
 
@@ -119,24 +119,24 @@ You will need to create your own command to generate the container. You can adap
 package main
 
 import (
-	"fmt"
-	"os"
+    "fmt"
+    "os"
 
-	"github.com/sarulabs/dingo/v4"
-	provider "YOUR_OWN_PROVIDER_PACKAGE"
+    "github.com/sarulabs/dingo/v4"
+    provider "YOUR_OWN_PROVIDER_PACKAGE"
 )
 
 func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("usage: go run main.go path/to/output/directory")
-		os.Exit(1)
-	}
+    if len(os.Args) != 2 {
+        fmt.Println("usage: go run main.go path/to/output/directory")
+        os.Exit(1)
+    }
 
-	err := dingo.GenerateContainer((*provider.Provider)(nil), os.Args[1])
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
+    err := dingo.GenerateContainer((*provider.Provider)(nil), os.Args[1])
+    if err != nil {
+        fmt.Println(err.Error())
+        os.Exit(1)
+    }
 }
 ```
 
