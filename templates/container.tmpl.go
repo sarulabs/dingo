@@ -233,11 +233,12 @@ var ContainerTemplate = `
 		func (c *Container) SafeGet<<< $def.FormattedName >>>() (<<< $def.ObjectType >>>, error) {
 			i, err := c.ctn.SafeGet("<<< $def.Name >>>")
 			if err != nil {
-				return <<< $def.EmptyObject >>>, err
+				var eo <<< $def.ObjectType >>>
+				return eo, err
 			}
 			o, ok := i.(<<< $def.ObjectType >>>)
 			if !ok {
-				return <<< $def.EmptyObject >>>, errors.New("could get '<<< $def.Name >>>' because the object could not be cast to <<< $def.ObjectType >>>")
+				return o, errors.New("could get '<<< $def.Name >>>' because the object could not be cast to <<< $def.ObjectType >>>")
 			}
 			return o, nil
 		}
@@ -257,11 +258,12 @@ var ContainerTemplate = `
 		func (c *Container) UnscopedSafeGet<<< $def.FormattedName >>>() (<<< $def.ObjectType >>>, error) {
 			i, err := c.ctn.UnscopedSafeGet("<<< $def.Name >>>")
 			if err != nil {
-				return <<< $def.EmptyObject >>>, err
+				var eo <<< $def.ObjectType >>>
+				return eo, err
 			}
 			o, ok := i.(<<< $def.ObjectType >>>)
 			if !ok {
-				return <<< $def.EmptyObject >>>, errors.New("could get '<<< $def.Name >>>' because the object could not be cast to <<< $def.ObjectType >>>")
+				return o, errors.New("could get '<<< $def.Name >>>' because the object could not be cast to <<< $def.ObjectType >>>")
 			}
 			return o, nil
 		}

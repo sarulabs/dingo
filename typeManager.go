@@ -17,19 +17,6 @@ var reservedPkgNames = map[string]struct{}{
 	"http":        struct{}{},
 }
 
-// RegisteredType is the representation of a type.
-// It contains the type name and how to write
-// its empty value in a go file.
-type RegisteredType struct {
-	Type       string
-	EmptyValue string
-}
-
-// NewRegisteredType is the RegisteredType constructor.
-func NewRegisteredType(typ, empty string) *RegisteredType {
-	return &RegisteredType{Type: typ, EmptyValue: empty}
-}
-
 // TypeManager maintains a list of all the import paths
 // that are used in the types that it has registered.
 // It associates a unique alias to all the import paths.
@@ -52,42 +39,42 @@ func (tm *TypeManager) Imports() map[string]string {
 }
 
 // Register adds a new type in the TypeManager.
-func (tm *TypeManager) Register(t reflect.Type) (*RegisteredType, error) {
+func (tm *TypeManager) Register(t reflect.Type) (string, error) {
 	switch t.Kind() {
 	case reflect.Invalid:
-		return nil, errors.New("invalid type")
+		return "", errors.New("invalid type")
 	case reflect.Bool:
-		return NewRegisteredType("bool", "false"), nil
+		return "bool", nil
 	case reflect.Int:
-		return NewRegisteredType("int", "0"), nil
+		return "int", nil
 	case reflect.Int8:
-		return NewRegisteredType("int8", "0"), nil
+		return "int8", nil
 	case reflect.Int16:
-		return NewRegisteredType("int16", "0"), nil
+		return "int16", nil
 	case reflect.Int32:
-		return NewRegisteredType("int32", "0"), nil
+		return "int32", nil
 	case reflect.Int64:
-		return NewRegisteredType("int64", "0"), nil
+		return "int64", nil
 	case reflect.Uint:
-		return NewRegisteredType("uint", "0"), nil
+		return "uint", nil
 	case reflect.Uint8:
-		return NewRegisteredType("uint8", "0"), nil
+		return "uint8", nil
 	case reflect.Uint16:
-		return NewRegisteredType("uint16", "0"), nil
+		return "uint16", nil
 	case reflect.Uint32:
-		return NewRegisteredType("uint32", "0"), nil
+		return "uint32", nil
 	case reflect.Uint64:
-		return NewRegisteredType("uint64", "0"), nil
+		return "uint64", nil
 	case reflect.Uintptr:
-		return nil, errors.New("Uintptr is not supported")
+		return "", errors.New("Uintptr is not supported")
 	case reflect.Float32:
-		return NewRegisteredType("float32", "0"), nil
+		return "float32", nil
 	case reflect.Float64:
-		return NewRegisteredType("float64", "0"), nil
+		return "float64", nil
 	case reflect.Complex64:
-		return NewRegisteredType("complex64", "0"), nil
+		return "complex64", nil
 	case reflect.Complex128:
-		return NewRegisteredType("complex128", "0"), nil
+		return "complex128", nil
 	case reflect.Array:
 		return tm.registerArray(t)
 	case reflect.Chan:
@@ -103,106 +90,106 @@ func (tm *TypeManager) Register(t reflect.Type) (*RegisteredType, error) {
 	case reflect.Slice:
 		return tm.registerSlice(t)
 	case reflect.String:
-		return NewRegisteredType("string", "\"\""), nil
+		return "string", nil
 	case reflect.Struct:
 		return tm.registerStruct(t)
 	case reflect.UnsafePointer:
-		return nil, errors.New("UnsafePointer is not supported")
+		return "", errors.New("UnsafePointer is not supported")
 	default:
-		return nil, errors.New("type is not supported")
+		return "", errors.New("type is not supported")
 	}
 }
 
-func (tm *TypeManager) registerArray(t reflect.Type) (*RegisteredType, error) {
-	elt, err := tm.Register(t.Elem())
+func (tm *TypeManager) registerArray(t reflect.Type) (string, error) {
+	eltType, err := tm.Register(t.Elem())
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	return NewRegisteredType("["+strconv.Itoa(t.Len())+"]"+elt.Type, "nil"), nil
+	return "[" + strconv.Itoa(t.Len()) + "]" + eltType, nil
 }
 
-func (tm *TypeManager) registerChan(t reflect.Type) (*RegisteredType, error) {
-	elt, err := tm.Register(t.Elem())
+func (tm *TypeManager) registerChan(t reflect.Type) (string, error) {
+	eltType, err := tm.Register(t.Elem())
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	return NewRegisteredType(t.ChanDir().String()+" "+elt.Type, "nil"), nil
+	return t.ChanDir().String() + " " + eltType, nil
 }
 
-func (tm *TypeManager) registerFunc(t reflect.Type) (*RegisteredType, error) {
-	in := make([]string, 0, t.NumIn())
+func (tm *TypeManager) registerFunc(t reflect.Type) (string, error) {
+	inTypes := make([]string, 0, t.NumIn())
 
 	for i := 0; i < t.NumIn(); i++ {
-		elt, err := tm.Register(t.In(i))
+		eltType, err := tm.Register(t.In(i))
 		if err != nil {
-			return nil, err
+			return "", err
 		}
-		in = append(in, elt.Type)
+		inTypes = append(inTypes, eltType)
 	}
 
-	out := make([]string, 0, t.NumOut())
+	outTypes := make([]string, 0, t.NumOut())
 
 	for i := 0; i < t.NumOut(); i++ {
-		elt, err := tm.Register(t.Out(i))
+		eltType, err := tm.Register(t.Out(i))
 		if err != nil {
-			return nil, err
+			return "", err
 		}
-		out = append(out, elt.Type)
+		outTypes = append(outTypes, eltType)
 	}
 
-	switch len(out) {
+	switch len(outTypes) {
 	case 0:
-		return NewRegisteredType("func("+strings.Join(in, ", ")+")", "nil"), nil
+		return "func(" + strings.Join(inTypes, ", ") + ")", nil
 	case 1:
-		return NewRegisteredType("func("+strings.Join(in, ", ")+") "+out[0], "nil"), nil
+		return "func(" + strings.Join(inTypes, ", ") + ") " + outTypes[0], nil
 	default:
-		return NewRegisteredType("func("+strings.Join(in, ", ")+") ("+strings.Join(out, ", ")+")", "nil"), nil
+		return "func(" + strings.Join(inTypes, ", ") + ") (" + strings.Join(outTypes, ", ") + ")", nil
 	}
 }
 
-func (tm *TypeManager) registerInterface(t reflect.Type) (*RegisteredType, error) {
+func (tm *TypeManager) registerInterface(t reflect.Type) (string, error) {
 	if alias := tm.addImport(t.PkgPath()); alias != "" {
-		return NewRegisteredType(alias+"."+t.Name(), "nil"), nil
+		return alias + "." + t.Name(), nil
 	}
 	if t.Name() == "" {
-		return NewRegisteredType("interface{}", "nil"), nil
+		return "interface{}", nil
 	}
-	return NewRegisteredType(t.Name(), "nil"), nil
+	return t.Name(), nil
 }
 
-func (tm *TypeManager) registerMap(t reflect.Type) (*RegisteredType, error) {
-	key, err := tm.Register(t.Key())
+func (tm *TypeManager) registerMap(t reflect.Type) (string, error) {
+	keyType, err := tm.Register(t.Key())
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	elt, err := tm.Register(t.Elem())
+	eltType, err := tm.Register(t.Elem())
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	return NewRegisteredType("map["+key.Type+"]"+elt.Type, "nil"), nil
+	return "map[" + keyType + "]" + eltType, nil
 }
 
-func (tm *TypeManager) registerPtr(t reflect.Type) (*RegisteredType, error) {
-	elt, err := tm.Register(t.Elem())
+func (tm *TypeManager) registerPtr(t reflect.Type) (string, error) {
+	eltType, err := tm.Register(t.Elem())
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	return NewRegisteredType("*"+elt.Type, "nil"), nil
+	return "*" + eltType, nil
 }
 
-func (tm *TypeManager) registerSlice(t reflect.Type) (*RegisteredType, error) {
-	elt, err := tm.Register(t.Elem())
+func (tm *TypeManager) registerSlice(t reflect.Type) (string, error) {
+	eltType, err := tm.Register(t.Elem())
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	return NewRegisteredType("[]"+elt.Type, "nil"), nil
+	return "[]" + eltType, nil
 }
 
-func (tm *TypeManager) registerStruct(t reflect.Type) (*RegisteredType, error) {
+func (tm *TypeManager) registerStruct(t reflect.Type) (string, error) {
 	if alias := tm.addImport(t.PkgPath()); alias != "" {
-		return NewRegisteredType(alias+"."+t.Name(), alias+"."+t.Name()+"{}"), nil
+		return alias + "." + t.Name(), nil
 	}
-	return NewRegisteredType(t.Name(), t.Name()+"{}"), nil
+	return t.Name(), nil
 }
 
 func (tm *TypeManager) addImport(pkg string) string {
