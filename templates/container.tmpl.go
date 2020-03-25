@@ -23,8 +23,6 @@ var ContainerTemplate = `
 		<<< $alias >>> "<<< $pkg >>>"<<< end >>>
 	)
 
-	var _ = errors.New("always import errors")
-
 	// C retrieves a Container from an interface.
 	// The function panics if the Container can not be retrieved.
 	//
