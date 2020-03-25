@@ -1,9 +1,6 @@
 package models
 
-// InterfacesTestInterface is an interface used in the tests.
-type InterfacesTestInterface interface {
-	Test()
-}
+import "github.com/sarulabs/dingo/v4/tests/app/models/testinterfaces"
 
 // InterfacesTestA is a structure used in the tests.
 type InterfacesTestA struct {
@@ -15,5 +12,5 @@ func (ita InterfacesTestA) Test() {}
 
 // InterfacesTestB is a structure used in the tests.
 type InterfacesTestB struct {
-	InterfacesTestInterface InterfacesTestInterface
+	InterfacesTestInterface testinterfaces.InterfacesTestInterface
 }

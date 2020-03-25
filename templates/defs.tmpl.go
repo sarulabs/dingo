@@ -19,8 +19,6 @@ var DefsTemplate = `
 		<<< $alias >>> "<<< $pkg >>>"<<< end >>>
 	)
 
-	var _ = errors.New("always import errors")
-
 	func getDiDefs(provider dingo.Provider) []di.Def {
 		return []di.Def{
 			<<<- range $index, $def := .Defs ->>>

@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"text/template"
+
+	"golang.org/x/tools/imports"
 )
 
 // WriteTemplate executes the given templates with the given data.
@@ -23,14 +24,14 @@ func WriteTemplate(filename string, tmpl string, data interface{}) error {
 		return err
 	}
 
+	content, err = imports.Process(filename, content, nil)
+	if err != nil {
+		return fmt.Errorf("formatting file failed: %v", err)
+	}
+
 	err = ioutil.WriteFile(filename, content, 0664)
 	if err != nil {
 		return fmt.Errorf("writing file failed: %v", err)
-	}
-
-	out, err := exec.Command("gofmt", "-w", filename).CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("gofmt failed: %s", string(out))
 	}
 
 	return nil
