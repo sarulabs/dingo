@@ -9,12 +9,12 @@ import (
 )
 
 var reservedPkgNames = map[string]struct{}{
-	"dingo":       struct{}{},
-	"di":          struct{}{},
-	"providerPkg": struct{}{},
-	"errors":      struct{}{},
-	"fmt":         struct{}{},
-	"http":        struct{}{},
+	"dingo":       {},
+	"di":          {},
+	"providerPkg": {},
+	"errors":      {},
+	"fmt":         {},
+	"http":        {},
 }
 
 // TypeManager maintains a list of all the import paths
@@ -44,37 +44,37 @@ func (tm *TypeManager) Register(t reflect.Type) (string, error) {
 	case reflect.Invalid:
 		return "", errors.New("invalid type")
 	case reflect.Bool:
-		return "bool", nil
+		return tm.registerBasicType(t)
 	case reflect.Int:
-		return "int", nil
+		return tm.registerBasicType(t)
 	case reflect.Int8:
-		return "int8", nil
+		return tm.registerBasicType(t)
 	case reflect.Int16:
-		return "int16", nil
+		return tm.registerBasicType(t)
 	case reflect.Int32:
-		return "int32", nil
+		return tm.registerBasicType(t)
 	case reflect.Int64:
-		return "int64", nil
+		return tm.registerBasicType(t)
 	case reflect.Uint:
-		return "uint", nil
+		return tm.registerBasicType(t)
 	case reflect.Uint8:
-		return "uint8", nil
+		return tm.registerBasicType(t)
 	case reflect.Uint16:
-		return "uint16", nil
+		return tm.registerBasicType(t)
 	case reflect.Uint32:
-		return "uint32", nil
+		return tm.registerBasicType(t)
 	case reflect.Uint64:
-		return "uint64", nil
+		return tm.registerBasicType(t)
 	case reflect.Uintptr:
 		return "", errors.New("Uintptr is not supported")
 	case reflect.Float32:
-		return "float32", nil
+		return tm.registerBasicType(t)
 	case reflect.Float64:
-		return "float64", nil
+		return tm.registerBasicType(t)
 	case reflect.Complex64:
-		return "complex64", nil
+		return tm.registerBasicType(t)
 	case reflect.Complex128:
-		return "complex128", nil
+		return tm.registerBasicType(t)
 	case reflect.Array:
 		return tm.registerArray(t)
 	case reflect.Chan:
@@ -90,7 +90,7 @@ func (tm *TypeManager) Register(t reflect.Type) (string, error) {
 	case reflect.Slice:
 		return tm.registerSlice(t)
 	case reflect.String:
-		return "string", nil
+		return tm.registerBasicType(t)
 	case reflect.Struct:
 		return tm.registerStruct(t)
 	case reflect.UnsafePointer:
@@ -101,6 +101,9 @@ func (tm *TypeManager) Register(t reflect.Type) (string, error) {
 }
 
 func (tm *TypeManager) registerArray(t reflect.Type) (string, error) {
+	if t.Name() != "" {
+		return tm.registerNamedType(t)
+	}
 	eltType, err := tm.Register(t.Elem())
 	if err != nil {
 		return "", err
@@ -108,7 +111,26 @@ func (tm *TypeManager) registerArray(t reflect.Type) (string, error) {
 	return "[" + strconv.Itoa(t.Len()) + "]" + eltType, nil
 }
 
+func (tm *TypeManager) registerBasicType(t reflect.Type) (string, error) {
+	// Check if it is really a basic type ...
+	if t.Kind().String() == t.Name() {
+		return t.Name(), nil
+	}
+	// ... or if it is a type based on one.
+	return tm.registerNamedType(t)
+}
+
+func (tm *TypeManager) registerNamedType(t reflect.Type) (string, error) {
+	if alias := tm.addImport(t.PkgPath()); alias != "" {
+		return alias + "." + t.Name(), nil
+	}
+	return t.Name(), nil
+}
+
 func (tm *TypeManager) registerChan(t reflect.Type) (string, error) {
+	if t.Name() != "" {
+		return tm.registerNamedType(t)
+	}
 	eltType, err := tm.Register(t.Elem())
 	if err != nil {
 		return "", err
@@ -117,6 +139,10 @@ func (tm *TypeManager) registerChan(t reflect.Type) (string, error) {
 }
 
 func (tm *TypeManager) registerFunc(t reflect.Type) (string, error) {
+	if t.Name() != "" {
+		return tm.registerNamedType(t)
+	}
+
 	inTypes := make([]string, 0, t.NumIn())
 
 	for i := 0; i < t.NumIn(); i++ {
@@ -148,16 +174,16 @@ func (tm *TypeManager) registerFunc(t reflect.Type) (string, error) {
 }
 
 func (tm *TypeManager) registerInterface(t reflect.Type) (string, error) {
-	if alias := tm.addImport(t.PkgPath()); alias != "" {
-		return alias + "." + t.Name(), nil
+	if t.Name() != "" {
+		return tm.registerNamedType(t)
 	}
-	if t.Name() == "" {
-		return "interface{}", nil
-	}
-	return t.Name(), nil
+	return "interface{}", nil
 }
 
 func (tm *TypeManager) registerMap(t reflect.Type) (string, error) {
+	if t.Name() != "" {
+		return tm.registerNamedType(t)
+	}
 	keyType, err := tm.Register(t.Key())
 	if err != nil {
 		return "", err
@@ -170,6 +196,9 @@ func (tm *TypeManager) registerMap(t reflect.Type) (string, error) {
 }
 
 func (tm *TypeManager) registerPtr(t reflect.Type) (string, error) {
+	if t.Name() != "" {
+		return tm.registerNamedType(t)
+	}
 	eltType, err := tm.Register(t.Elem())
 	if err != nil {
 		return "", err
@@ -178,6 +207,9 @@ func (tm *TypeManager) registerPtr(t reflect.Type) (string, error) {
 }
 
 func (tm *TypeManager) registerSlice(t reflect.Type) (string, error) {
+	if t.Name() != "" {
+		return tm.registerNamedType(t)
+	}
 	eltType, err := tm.Register(t.Elem())
 	if err != nil {
 		return "", err
@@ -186,10 +218,10 @@ func (tm *TypeManager) registerSlice(t reflect.Type) (string, error) {
 }
 
 func (tm *TypeManager) registerStruct(t reflect.Type) (string, error) {
-	if alias := tm.addImport(t.PkgPath()); alias != "" {
-		return alias + "." + t.Name(), nil
+	if t.Name() != "" {
+		return tm.registerNamedType(t)
 	}
-	return t.Name(), nil
+	return "struct{}", nil
 }
 
 func (tm *TypeManager) addImport(pkg string) string {

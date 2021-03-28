@@ -53,4 +53,22 @@ var BuildFuncDecls = []dingo.Def{
 			"2": "value",
 		},
 	},
+	{
+		Name: "test_build_func_5",
+		Build: func() (models.TypeBasedOnBasicType, error) {
+			return models.TypeBasedOnBasicType(999), nil
+		},
+	},
+	{
+		Name: "test_build_func_6",
+		Build: func() (models.TypeBasedOnSliceOfBasicType, error) {
+			return models.TypeBasedOnSliceOfBasicType([]byte("test")), nil
+		},
+	},
+	{
+		Name: "test_build_func_7",
+		Build: func() (struct{}, error) {
+			return struct{}{}, nil
+		},
+	},
 }

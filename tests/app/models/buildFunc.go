@@ -17,3 +17,9 @@ type BuildFuncTestB struct {
 type BuildFuncTestC struct {
 	P1 string
 }
+
+// TypeBasedOnBasicType is a type used in the tests.
+type TypeBasedOnBasicType int64
+
+// TypeBasedOnSliceOfBasicType is a type used in the tests.
+type TypeBasedOnSliceOfBasicType []byte
