@@ -39,6 +39,7 @@ var DefsTemplate = `
 		Scope: "<<< .Scope >>>",
 		Build: func(ctn di.Container) (interface{}, error) <<< template "buildBody" . >>>,
 		Close: func(obj interface{}) error <<< template "closeBody" . >>>,
+		Unshared: <<< .Unshared >>>,
 	},
 <<<- end >>>
 
