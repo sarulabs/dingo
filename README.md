@@ -146,6 +146,16 @@ Running the following command will generate the code in the `path/to/generated/c
 go run main.go path/to/generated/code
 ```
 
+### Custom package name
+
+If you want to customize the package name for the generated code you can use `dingo.GenerateContainerWithCustomPkgName` instead of `dingo.GenerateContainer`.
+
+```go
+// The default package name is "dic", but you can replace it with the name of your choosing.
+// Go files will be generated in os.Args[1]+"/dic/".
+err := dingo.GenerateContainerWithCustomPkgName((*provider.Provider)(nil), os.Args[1], "dic")
+```
+
 # Definitions
 
 ## Name and scope
@@ -155,6 +165,8 @@ Dingo definitions are not that different from [sarulabs/di](https://github.com/s
 They have a `name` and a `scope`. For more information about scopes, refer to the documentation of [sarulabs/di](https://github.com/sarulabs/di).
 
 The default scopes are `di.App`, `di.Request` and `di.SubRequest`.
+
+ The `Unshared` field is also available (see [sarulabs/di unshared objects](https://github.com/sarulabs/di#unshared-objects)).
 
 ## Build based on a structure
 
