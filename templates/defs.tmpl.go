@@ -8,7 +8,7 @@ var DefsTemplate = `
 ############################# */>>>
 
 <<< define "base" ->>>
-	package dic
+	package <<< .PkgName >>>
 
 	import (
 		"errors"

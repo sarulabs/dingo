@@ -14,7 +14,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	err := dingo.GenerateContainer((*provider.Provider)(nil), os.Args[1])
+	err := dingo.GenerateContainerWithCustomPkgName((*provider.Provider)(nil), os.Args[1], "dic")
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
