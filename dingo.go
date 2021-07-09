@@ -2,7 +2,10 @@ package dingo
 
 // Def is the structure containing a service definition.
 type Def struct {
-	Name  string
+	// Name is the key that is used to retrieve the object from the container.
+	Name string
+	// Scope determines in which container the object is stored.
+	// Typical scopes are "app" and "request".
 	Scope string
 	// NotForAutoFill should be set to true if you
 	// do not want to use this service automatically
@@ -17,6 +20,10 @@ type Def struct {
 	// Close should be a function: func(any) error.
 	// With any being the type of the service.
 	Close interface{}
+	// Unshared is false by default. That means that the object is only created once in a given container.
+	// They are singleton and the same instance will be returned each time "Get", "SafeGet" or "Fill" is called.
+	// If you want to retrieve a new object every time, "Unshared" needs to be set to true.
+	Unshared bool
 }
 
 // Params are used to assist the service constructor.

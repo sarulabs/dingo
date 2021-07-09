@@ -27,6 +27,7 @@ type ScannedDef struct {
 	BuildTypeString  string
 	Params           map[string]*ParamInfo
 	CloseTypeString  string
+	Unshared         bool
 }
 
 // ParamsString returns the parameters as they should appear

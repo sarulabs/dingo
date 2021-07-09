@@ -69,6 +69,7 @@ func (s *Scanner) scanDef(def *Def) error {
 		Name:          def.Name,
 		FormattedName: FormatDefName(def.Name),
 		Scope:         def.Scope,
+		Unshared:      def.Unshared,
 	}
 
 	if err := DefNameIsAllowed(sDef.FormattedName); err != nil {

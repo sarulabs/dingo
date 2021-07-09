@@ -60,5 +60,8 @@ func (p *Provider) Load() error {
 	if err := p.AddDefSlice(services.ScopeDecls); err != nil {
 		return err
 	}
+	if err := p.AddDefSlice(services.UnsharedDecls); err != nil {
+		return err
+	}
 	return nil
 }
