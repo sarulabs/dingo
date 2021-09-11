@@ -51,11 +51,11 @@ var ContainerTemplate = `
 		builder *di.Builder
 	}
 
-	// NewBuilder creates a builder that can create a Container.
-	// You should you NewContainer to create the container directly.
-	// Using NewBuilder allows you to redefine some di services though.
-	// This could be used for testing.
-	// But this behaviour is not safe, so be sure to know what you are doing.
+	// NewBuilder creates a builder that can be used to create a Container.
+	// You probably should use NewContainer to create the container directly.
+	// But using NewBuilder allows you to redefine some di services.
+	// This can be used for testing.
+	// But this behavior is not safe, so be sure to know what you are doing.
 	func NewBuilder(scopes ...string) (*builder, error) {
 		if len(scopes) == 0 {
 			scopes = []string{di.App, di.Request, di.SubRequest}
@@ -226,8 +226,11 @@ var ContainerTemplate = `
 	}
 
 	<<< range $index, $def := .Defs ->>>
-		// SafeGet<<< $def.FormattedName >>> works like SafeGet but only for <<< $def.FormattedName >>>.
-		// It does not return an interface but a <<< $def.ObjectTypeString >>>.
+		// SafeGet<<< $def.FormattedName >>> retrieves the "<<< $def.Name >>>" object from the <<< $def.GenerateCommentScope >>> scope.
+		//
+<<< $def.GenerateComment >>>
+		//
+		// If the object can not be retrieved, it returns an error.
 		func (c *Container) SafeGet<<< $def.FormattedName >>>() (<<< $def.ObjectTypeString >>>, error) {
 			i, err := c.ctn.SafeGet("<<< $def.Name >>>")
 			if err != nil {
@@ -241,8 +244,11 @@ var ContainerTemplate = `
 			return o, nil
 		}
 
-		// Get<<< $def.FormattedName >>> is similar to SafeGet<<< $def.FormattedName >>> but it does not return the error.
-		// Instead it panics.
+		// Get<<< $def.FormattedName >>> retrieves the "<<< $def.Name >>>" object from the <<< $def.GenerateCommentScope >>> scope.
+		//
+<<< $def.GenerateComment >>>
+		//
+		// If the object can not be retrieved, it panics.
 		func (c *Container) Get<<< $def.FormattedName >>>() <<< $def.ObjectTypeString >>> {
 			o, err := c.SafeGet<<< $def.FormattedName >>>()
 			if err != nil {
@@ -251,8 +257,12 @@ var ContainerTemplate = `
 			return o
 		}
 
-		// UnscopedSafeGet<<< $def.FormattedName >>> works like UnscopedSafeGet but only for <<< $def.FormattedName >>>.
-		// It does not return an interface but a <<< $def.ObjectTypeString >>>.
+		// UnscopedSafeGet<<< $def.FormattedName >>> retrieves the "<<< $def.Name >>>" object from the <<< $def.GenerateCommentScope >>> scope.
+		//
+<<< $def.GenerateComment >>>
+		//
+		// This method can be called even if <<< $def.GenerateCommentScope >>> is a sub-scope of the container.
+		// If the object can not be retrieved, it returns an error.
 		func (c *Container) UnscopedSafeGet<<< $def.FormattedName >>>() (<<< $def.ObjectTypeString >>>, error) {
 			i, err := c.ctn.UnscopedSafeGet("<<< $def.Name >>>")
 			if err != nil {
@@ -266,8 +276,12 @@ var ContainerTemplate = `
 			return o, nil
 		}
 
-		// UnscopedGet<<< $def.FormattedName >>> is similar to UnscopedSafeGet<<< $def.FormattedName >>> but it does not return the error.
-		// Instead it panics.
+		// UnscopedGet<<< $def.FormattedName >>> retrieves the "<<< $def.Name >>>" object from the <<< $def.GenerateCommentScope >>> scope.
+		//
+<<< $def.GenerateComment >>>
+		//
+		// This method can be called even if <<< $def.GenerateCommentScope >>> is a sub-scope of the container.
+		// If the object can not be retrieved, it panics.
 		func (c *Container) UnscopedGet<<< $def.FormattedName >>>() <<< $def.ObjectTypeString >>> {
 			o, err := c.UnscopedSafeGet<<< $def.FormattedName >>>()
 			if err != nil {
@@ -276,9 +290,12 @@ var ContainerTemplate = `
 			return o
 		}
 
-		// <<< $def.FormattedName >>> is similar to Get<<< $def.FormattedName >>>.
+		// <<< $def.FormattedName >>> retrieves the "<<< $def.Name >>>" object from the <<< $def.GenerateCommentScope >>> scope.
+		//
+<<< $def.GenerateComment >>>
+		//
 		// It tries to find the container with the C method and the given interface.
-		// If the container can be retrieved, it applies the Get<<< $def.FormattedName >>> method.
+		// If the container can be retrieved, it calls the Get<<< $def.FormattedName >>> method.
 		// If the container can not be retrieved, it panics.
 		func <<< $def.FormattedName >>>(i interface{}) <<< $def.ObjectTypeString >>> {
 			return C(i).Get<<< $def.FormattedName >>>()

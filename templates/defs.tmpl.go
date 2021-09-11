@@ -38,7 +38,9 @@ var DefsTemplate = `
 		Name: "<<< .Name >>>",
 		Scope: "<<< .Scope >>>",
 		Build: func(ctn di.Container) (interface{}, error) <<< template "buildBody" . >>>,
+		<<<-  if ne .CloseTypeString "" >>>
 		Close: func(obj interface{}) error <<< template "closeBody" . >>>,
+		<<<- end >>>
 		Unshared: <<< .Unshared >>>,
 	},
 <<<- end >>>
