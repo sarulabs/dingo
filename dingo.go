@@ -24,6 +24,9 @@ type Def struct {
 	// They are singleton and the same instance will be returned each time "Get", "SafeGet" or "Fill" is called.
 	// If you want to retrieve a new object every time, "Unshared" needs to be set to true.
 	Unshared bool
+	// Description is a text that describes the service.
+	// If provided, the description is used in the comments of the generated code.
+	Description string
 }
 
 // Params are used to assist the service constructor.

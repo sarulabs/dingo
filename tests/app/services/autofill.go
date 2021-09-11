@@ -12,6 +12,9 @@ var AutofillDecls = []dingo.Def{
 		Build:          (*models.AutofillTestA)(nil),
 		NotForAutoFill: true,
 		Params:         dingo.Params{"Value": "A1"},
+		Description: `Test description.
+
+Even on multiple lines.`,
 	},
 	{
 		Name:   "test_autofill_2",
