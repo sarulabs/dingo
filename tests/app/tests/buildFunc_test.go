@@ -19,6 +19,7 @@ func TestBuildFunc(t *testing.T) {
 	expected4 := &models.BuildFuncTestA{P1: "9999", P2: models.BuildFuncTestB{P1: "value", P2: expected3}, P3: expected3}
 	expected5 := models.TypeBasedOnBasicType(999)
 	expected6 := models.TypeBasedOnSliceOfBasicType([]byte("test"))
+	expected8 := &models.BuildFuncTestA{P1: "9999", P2: models.BuildFuncTestB{P1: "value", P2: expected3}, P3: expected3}
 
 	assert.Equal(t, expected1, container.GetTestBuildFunc1())
 	assert.Equal(t, expected2, container.GetTestBuildFunc2())
@@ -52,4 +53,8 @@ func TestBuildFunc(t *testing.T) {
 	res7, err := container.SafeGetTestBuildFunc7()
 	assert.Nil(t, err)
 	assert.Equal(t, struct{}{}, res7)
+
+	res8, err := container.SafeGetTestBuildFunc8()
+	assert.Nil(t, err)
+	assert.Equal(t, expected8, res8)
 }
