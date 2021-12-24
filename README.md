@@ -246,6 +246,25 @@ The build function can actually take as many input parameters as needed. In `Def
 
 The key is the index of the input parameter.
 
+To make things easier, there is the `NewFuncParams` that can generate the `Params` map without having to specify the keys:
+
+```go
+dingo.Def{
+    Name: "other-object",
+    Build: func(myObject *MyObject, s string) (*OtherObject, error) {
+        return &OtherObject{
+            FieldA: myObject,
+            FieldB: s,
+        }, nil
+    },
+    // Same as dingo.Params{"0": dingo.Service("my-object"), "1": "value"}
+    Params: dingo.NewFuncParams(
+        dingo.Service("my-object"),
+        "value"
+    ),
+}
+```
+
 ## Parameters
 
 As explained before, the key of `Def.Params` is either the field name (for build structures) or the index of the input parameter (for build functions).

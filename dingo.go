@@ -1,5 +1,7 @@
 package dingo
 
+import "strconv"
+
 // Def is the structure containing a service definition.
 type Def struct {
 	// Name is the key that is used to retrieve the object from the container.
@@ -39,6 +41,17 @@ type Def struct {
 //
 // key=fieldName¦paramIndex value=any¦dingo.Service|dingo.AutoFill
 type Params map[string]interface{}
+
+// NewFuncParams creates a Params instance where the key of the map, is the index of the given parameter.
+// It is usefull when using a Build function, to provide all the function parameters.
+// e.g.: NewFuncParams("a", "b", "c") return Params{"0": "a", "1": "b", "2": "c"}
+func NewFuncParams(params ...interface{}) Params {
+	p := make(Params, len(params))
+	for k, v := range params {
+		p[strconv.Itoa(k)] = v
+	}
+	return p
+}
 
 // Service can be used as Params value.
 // It means that the field (or parameter) should be replaced
