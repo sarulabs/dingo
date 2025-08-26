@@ -66,7 +66,7 @@ func (tm *TypeManager) Register(t reflect.Type) (string, error) {
 	case reflect.Uint64:
 		return tm.registerBasicType(t)
 	case reflect.Uintptr:
-		return "", errors.New("Uintptr is not supported")
+		return "", errors.New("type Uintptr is not supported")
 	case reflect.Float32:
 		return tm.registerBasicType(t)
 	case reflect.Float64:
@@ -94,7 +94,7 @@ func (tm *TypeManager) Register(t reflect.Type) (string, error) {
 	case reflect.Struct:
 		return tm.registerStruct(t)
 	case reflect.UnsafePointer:
-		return "", errors.New("UnsafePointer is not supported")
+		return "", errors.New("type UnsafePointer is not supported")
 	default:
 		return "", errors.New("type is not supported")
 	}

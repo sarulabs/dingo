@@ -7,7 +7,7 @@ import (
 	"github.com/sarulabs/dingo/v4/templates"
 )
 
-// GenerateContainer generates a depedency injection container.
+// GenerateContainer generates a dependency injection container.
 // The definitions are loaded from the Provider.
 // The code is generated in the outputDirectory.
 func GenerateContainer(provider Provider, outputDirectory string) error {

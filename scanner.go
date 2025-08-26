@@ -100,7 +100,7 @@ func (s *Scanner) scanBuild(def *Def, scannedDef *ScannedDef) error {
 		return s.scanBuildStruct(def, scannedDef, t)
 	}
 
-	return errors.New("Build should be a function or a pointer to a structure")
+	return errors.New("the definition Build property should be a function or a pointer to a structure")
 }
 
 func (s *Scanner) scanBuildFunc(def *Def, scannedDef *ScannedDef, buildT reflect.Type) error {
@@ -132,11 +132,11 @@ func (s *Scanner) checkBuildFunc(t reflect.Type) error {
 	}
 
 	if t.NumOut() != 2 {
-		return errors.New("Build function must have 2 output parameters")
+		return errors.New("the Build function must have 2 output parameters")
 	}
 
 	if !t.Out(1).Implements(reflect.TypeOf((*error)(nil)).Elem()) {
-		return errors.New("Build function second output parameter should be an error")
+		return errors.New("the Build function second output parameter should be an error")
 	}
 
 	return nil
@@ -169,17 +169,17 @@ func (s *Scanner) scanClose(def *Def, scannedDef *ScannedDef) error {
 	t := reflect.TypeOf(def.Close)
 
 	if t.Kind() != reflect.Func {
-		return errors.New("Close should be a function")
+		return errors.New("the definition Close property should be a function")
 	}
 
 	errorInterface := reflect.TypeOf((*error)(nil)).Elem()
 
 	if t.NumOut() != 1 || !t.Out(0).Implements(errorInterface) {
-		return errors.New("Close should return an error")
+		return errors.New("the definition Close property should return an error")
 	}
 
 	if t.NumIn() != 1 {
-		return errors.New("Close should have exactly one input parameter")
+		return errors.New("the definition Close property should have exactly one input parameter")
 	}
 
 	return s.scanCloseParameter(def, scannedDef, t)
