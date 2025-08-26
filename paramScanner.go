@@ -162,7 +162,7 @@ func (s *ParamScanner) setParam(param *ParamInfo, def *ScannedDef) error {
 }
 
 func (s *ParamScanner) autofill(param *ParamInfo, acceptNotFound bool) error {
-	defs, _ := s.defsByType[param.TypeString]
+	defs := s.defsByType[param.TypeString]
 	if len(defs) == 0 && acceptNotFound {
 		param.UndefinedStructParam = true
 		return nil

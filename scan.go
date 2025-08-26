@@ -102,7 +102,7 @@ func (def *ScannedDef) GenerateCommentParams() string {
 
 	comment := "\t\t// \tparams:\n"
 	for _, key := range keys {
-		p, _ := def.Params[key]
+		p := def.Params[key]
 		k, _ := json.Marshal(key)
 
 		comment += "\t\t// \t\t- " + string(k) + ": "
