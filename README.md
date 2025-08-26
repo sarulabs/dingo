@@ -15,10 +15,9 @@ The disadvantage is that the code must be generated. But this can be compensated
 
 # Table of contents
 
-[![Build Status](https://travis-ci.org/sarulabs/dingo.svg?branch=master)](https://travis-ci.org/sarulabs/dingo)
-[![GoDoc](https://godoc.org/github.com/sarulabs/dingo?status.svg)](http://godoc.org/github.com/sarulabs/dingo)
-[![codebeat badge](https://codebeat.co/badges/833d6016-e4dd-482f-bcfe-210a1be48b94)](https://codebeat.co/projects/github-com-sarulabs-dingo-master)
-[![goreport](https://goreportcard.com/badge/github.com/sarulabs/dingo)](https://goreportcard.com/report/github.com/sarulabs/dingo)
+[![Go Reference](https://pkg.go.dev/badge/github.com/sarulabs/dingo.svg)](https://pkg.go.dev/github.com/sarulabs/dingo)
+![Go version](https://img.shields.io/badge/version-%3E%3D%201.16-007d9c?logo=go&logoColor=white&style=flat-square)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/sarulabs/dingo/workflow.yml?style=flat-square)
 
 - [Dependencies](#dependencies)
 - [Similarities with di](#similarities-with-di)
