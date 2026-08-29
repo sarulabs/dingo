@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/sarulabs/assets/master/dingo/logo_2025.png" width="250" />
+  <img src="https://raw.githubusercontent.com/sarulabs/assets/master/dingo/logo_2026.png" width="250" />
 </p>
 
 Generation of dependency injection containers for go programs (golang).
